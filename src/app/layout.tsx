@@ -5,7 +5,7 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Sustav za generiranje barkodova i računa",
+  title: "PDF Obrt / Barkod",
   description: "Generirajte PDF417 barkodove za plaćanja i PDF račune",
 }
 
