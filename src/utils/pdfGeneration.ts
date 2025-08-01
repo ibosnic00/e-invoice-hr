@@ -11,22 +11,26 @@ export const generatePDF = async (invoiceData: InvoiceData) => {
       throw new Error('PDF preview element not found');
     }
 
-    // Generiraj canvas iz HTML-a
+    // Generiraj canvas iz HTML-a - koristi stvarne dimenzije elementa
     const canvas = await html2canvas(pdfPreviewElement, {
       useCORS: true,
       allowTaint: true,
       background: '#ffffff',
-      width: 794, // A4 širina u pikselima (210mm)
-      height: 1123, // A4 visina u pikselima (297mm)
-      // Remove scale property as it's not supported in current version
+      // Ukloni fiksne dimenzije - neka html2canvas koristi stvarne dimenzije elementa
+      // width: 794, // A4 širina u pikselima (210mm)
+      // height: 1123, // A4 visina u pikselima (297mm)
     });
 
-    // Kreiraj PDF
+    // Kreiraj PDF s odgovarajućim dimenzijama
     const pdf = new jsPDF('p', 'mm', 'a4');
     const imgData = canvas.toDataURL('image/png');
     
-    // Dodaj sliku u PDF
-    pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
+    // Izračunaj omjer za pravilno skaliranje
+    const imgWidth = 210; // A4 širina u mm
+    const imgHeight = 297; // A4 visina u mm
+    
+    // Dodaj sliku u PDF s pravilnim dimenzijama
+    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
     
     // Spremi PDF
     pdf.save('racun.pdf');
