@@ -13,12 +13,12 @@ export const generatePDF = async (invoiceData: InvoiceData) => {
 
     // Generiraj canvas iz HTML-a
     const canvas = await html2canvas(pdfPreviewElement, {
-      scale: 2,
       useCORS: true,
       allowTaint: true,
-      backgroundColor: '#ffffff',
+      background: '#ffffff',
       width: 794, // A4 širina u pikselima (210mm)
       height: 1123, // A4 visina u pikselima (297mm)
+      // Remove scale property as it's not supported in current version
     });
 
     // Kreiraj PDF
