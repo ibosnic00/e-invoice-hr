@@ -44,6 +44,6 @@ const letterTable: { [key: string]: number } = {
     const ibanInteger = BigInt(numericIBAN);
   
     // Validate the IBAN using MOD97; a valid IBAN will have a remainder of 1
-    return ibanInteger % 97n === 1n;
+    return ibanInteger % BigInt(97) === BigInt(1);
   }
   
