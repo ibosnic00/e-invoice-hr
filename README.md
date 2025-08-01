@@ -4,7 +4,7 @@ A Next.js application for generating payment barcodes and invoices with PDF expo
 
 ## 🚀 Live Demo
 
-Visit the live demo: [https://your-username.github.io/your-repo-name](https://your-username.github.io/your-repo-name)
+Visit the live demo: [https://ibosnic00.github.io/e-invoice-hr](https://ibosnic00.github.io/e-invoice-hr)
 
 ## ✨ Features
 
