@@ -77,6 +77,9 @@ export default function SettingsComponent() {
     localStorage.getItem("vatNote") ||
       "PDV nije obračunat sukladno članku 90. stavku 1. i stavku 2. Zakona o PDV-u - mali porezni obveznik."
   );
+  const [mbo, setMbo] = useState(
+    localStorage.getItem("mbo") || ""
+  );
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isInvoiceSettingsExpanded, setIsInvoiceSettingsExpanded] =
     useState(false);
@@ -127,6 +130,7 @@ export default function SettingsComponent() {
         companyOIB: localStorage.getItem("companyOIB"),
         companyPhone: localStorage.getItem("companyPhone"),
         vatNote: localStorage.getItem("vatNote"),
+        mbo: localStorage.getItem("mbo"),
         customers: localStorage.getItem("savedCustomers"),
         timestamp: new Date().toISOString(),
       };
@@ -214,6 +218,8 @@ export default function SettingsComponent() {
           localStorage.setItem("companyPhone", importedData.companyPhone);
         if (importedData.vatNote)
           localStorage.setItem("vatNote", importedData.vatNote);
+        if (importedData.mbo)
+          localStorage.setItem("mbo", importedData.mbo);
         if (importedData.customers)
           localStorage.setItem("savedCustomers", importedData.customers);
 
@@ -258,6 +264,9 @@ export default function SettingsComponent() {
         }
         if (importedData.vatNote) {
           setVatNote(importedData.vatNote);
+        }
+        if (importedData.mbo) {
+          setMbo(importedData.mbo);
         }
         if (importedData.customers) {
           setCustomers(getCustomers());
@@ -413,6 +422,12 @@ export default function SettingsComponent() {
     setMessage({ type: "success", text: "Napomena je uspješno spremljena." });
   };
 
+  const handleMboChange = (value: string) => {
+    setMbo(value);
+    localStorage.setItem("mbo", value);
+    setMessage({ type: "success", text: "MBO je uspješno spremljen." });
+  };
+
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -479,6 +494,7 @@ export default function SettingsComponent() {
     setVatNote(
       "PDV nije obračunat sukladno članku 90. stavku 1. i stavku 2. Zakona o PDV-u - mali porezni obveznik."
     );
+    setMbo("");
     setCustomers([]);
     localStorage.removeItem("companyName");
     localStorage.removeItem("companyFullName");
@@ -493,6 +509,7 @@ export default function SettingsComponent() {
     localStorage.removeItem("companyOIB");
     localStorage.removeItem("companyPhone");
     localStorage.removeItem("vatNote");
+    localStorage.removeItem("mbo");
     localStorage.removeItem("savedCustomers");
 
     // Update invoice generator data if it exists
@@ -595,79 +612,6 @@ export default function SettingsComponent() {
                 {isInvoiceSettingsExpanded && (
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="company-name">Naziv obrta</Label>
-                      <Input
-                        id="company-name"
-                        value={companyName}
-                        onChange={(e) =>
-                          handleCompanyNameChange(e.target.value)
-                        }
-                        placeholder="Unesite naziv vašeg obrta"
-                      />
-                      <p className="text-sm text-gray-500">
-                        Kratki naziv koji će se prikazati ispod loga
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="bank-name">Naziv banke</Label>
-                      <Input
-                        id="bank-name"
-                        value={bankName}
-                        onChange={(e) => handleBankNameChange(e.target.value)}
-                        placeholder="npr. Otp Banka d.d."
-                      />
-                      <p className="text-sm text-gray-500">
-                        Naziv banke će se prikazati u PDF računima
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="invoice-issuer">Račun izradio</Label>
-                      <Input
-                        id="invoice-issuer"
-                        value={invoiceIssuer}
-                        onChange={(e) =>
-                          handleInvoiceIssuerChange(e.target.value)
-                        }
-                        placeholder="npr. Mate Matic"
-                      />
-                      <p className="text-sm text-gray-500">
-                        Ime osobe koja je izdala račun
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="company-phone">Broj telefona obrta</Label>
-                      <Input
-                        id="company-phone"
-                        value={companyPhone}
-                        onChange={(e) =>
-                          handleCompanyPhoneChange(e.target.value)
-                        }
-                        placeholder="npr. +385 1 2345 678"
-                      />
-                      <p className="text-sm text-gray-500">
-                        Broj telefona koji će se prikazati u PDF računima
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="vat-note">Napomena</Label>
-                      <Textarea
-                        id="vat-note"
-                        value={vatNote}
-                        onChange={(e) => handleVatNoteChange(e.target.value)}
-                        placeholder="Unesite napomenu koja će se prikazati u PDF računima"
-                        rows={3}
-                      />
-                      <p className="text-sm text-gray-500">
-                        Napomena koja će se prikazati u PDF računima ispod
-                        popisa stavki
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
                       <Label>Logo obrta</Label>
                       {companyLogo ? (
                         <div className="space-y-2">
@@ -711,6 +655,92 @@ export default function SettingsComponent() {
                           </p>
                         </div>
                       )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="company-name">Naziv obrta</Label>
+                      <Input
+                        id="company-name"
+                        value={companyName}
+                        onChange={(e) =>
+                          handleCompanyNameChange(e.target.value)
+                        }
+                        placeholder="Unesite naziv vašeg obrta"
+                      />
+                      <p className="text-sm text-gray-500">
+                        Kratki naziv koji će se prikazati ispod loga
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="invoice-issuer">Račun izradio</Label>
+                      <Input
+                        id="invoice-issuer"
+                        value={invoiceIssuer}
+                        onChange={(e) =>
+                          handleInvoiceIssuerChange(e.target.value)
+                        }
+                        placeholder="npr. Mate Matic"
+                      />
+                      <p className="text-sm text-gray-500">
+                        Ime osobe koja je izdala račun
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="company-phone">Broj telefona obrta</Label>
+                      <Input
+                        id="company-phone"
+                        value={companyPhone}
+                        onChange={(e) =>
+                          handleCompanyPhoneChange(e.target.value)
+                        }
+                        placeholder="npr. +385 1 2345 678"
+                      />
+                      <p className="text-sm text-gray-500">
+                        Broj telefona koji će se prikazati u računu
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="vat-note">Napomena</Label>
+                      <Textarea
+                        id="vat-note"
+                        value={vatNote}
+                        onChange={(e) => handleVatNoteChange(e.target.value)}
+                        placeholder="Unesite napomenu koja će se prikazati u PDF računima"
+                        rows={3}
+                      />
+                      <p className="text-sm text-gray-500">
+                        Napomena koja će se prikazati u računu ispod popisa
+                        stavki
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="mbo">Matični broj obrta</Label>
+                      <Input
+                        id="mbo"
+                        value={mbo}
+                        onChange={(e) => handleMboChange(e.target.value)}
+                        placeholder="npr. 12345678"
+                      />
+                      <p className="text-sm text-gray-500">
+                        Matični broj obrta koji će se prikazati u računu
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="bank-name">Naziv banke</Label>
+                      <Input
+                        id="bank-name"
+                        value={bankName}
+                        onChange={(e) => handleBankNameChange(e.target.value)}
+                        placeholder="npr. Otp Banka d.d."
+                      />
+                      <p className="text-sm text-gray-500">
+                        Naziv banke koji će se prikazati u zaglavlju računa
+                      </p>
                     </div>
                   </div>
                 )}

@@ -216,7 +216,7 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({ invoiceData }) => {
         display: 'flex',
         justifyContent: 'center'
       }}>
-               <div>{companyFullName}, {invoiceData.adresaVlasnika}, {invoiceData.postanskiBrojIGradVlasnika}; OIB: {invoiceData.oibVlasnika} .</div>
+               <div>{companyFullName}, {invoiceData.adresaVlasnika}, {invoiceData.postanskiBrojIGradVlasnika}; OIB: {invoiceData.oibVlasnika}; MBO: {localStorage.getItem('mbo') || ''}</div>
        <div>| Žiro račun IBAN {invoiceData.brojRacunaObrta} otvoren kod {localStorage.getItem('bankName') || 'banke'}</div>
       </div>
     </div>
