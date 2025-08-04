@@ -24,6 +24,7 @@ export default function HomePage() {
         sessionStorage.removeItem('pendingBarcodeData')
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [barcodeGeneratorRef.current])
 
   // Check for pending invoice data when ref is ready
@@ -36,6 +37,7 @@ export default function HomePage() {
         sessionStorage.removeItem('pendingInvoiceData')
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [invoiceGeneratorRef.current])
 
   const handleLoadBarcodeData = (data: any) => {

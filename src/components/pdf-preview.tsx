@@ -2,6 +2,7 @@ import React from 'react';
 import { InvoiceData } from '../types/types';
 import { generateBarcodeString } from '../utils/barcodePayment';
 import * as PDF417 from 'pdf417-generator';
+import Image from 'next/image';
 
 interface PDFPreviewProps {
   invoiceData: InvoiceData;
@@ -69,13 +70,15 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({ invoiceData }) => {
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '30px' }}>
         {/* Company Details (Left) */}
         <div style={{ flex: 1 }}>
-          {companyLogo && (
-            <img 
-              src={companyLogo} 
-              alt="Company Logo" 
-              style={{ width: '100px', height: '60px', marginBottom: '10px' }}
-            />
-          )}
+                     {companyLogo && (
+             <Image 
+               src={companyLogo} 
+               alt="Company Logo" 
+               width={100}
+               height={60}
+               style={{ marginBottom: '10px' }}
+             />
+           )}
           <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>
             {companyName}
           </div>
@@ -210,13 +213,15 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({ invoiceData }) => {
       {barcodeDataUrl && (
         <>
         <div style={{ marginBottom: '5px', fontSize: '10px' }}>Ili skenirajte QR kod</div>
-        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-          <img 
-            src={barcodeDataUrl} 
-            alt="Barcode" 
-            style={{ maxWidth: '100%', height: '100px' }}
-          />
-        </div>
+                 <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+           <Image 
+             src={barcodeDataUrl} 
+             alt="Barcode" 
+             width={250}
+             height={60}
+             style={{ maxWidth: '100%' }}
+           />
+         </div>
         </>
       )}
 
