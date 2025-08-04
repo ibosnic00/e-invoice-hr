@@ -74,9 +74,7 @@ export default function SettingsComponent() {
     localStorage.getItem("vatNote") ||
       "PDV nije obračunat sukladno članku 90. stavku 1. i stavku 2. Zakona o PDV-u - mali porezni obveznik."
   );
-  const [mbo, setMbo] = useState(
-    localStorage.getItem("mbo") || ""
-  );
+  const [mbo, setMbo] = useState(localStorage.getItem("mbo") || "");
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isInvoiceSettingsExpanded, setIsInvoiceSettingsExpanded] =
     useState(false);
@@ -203,8 +201,7 @@ export default function SettingsComponent() {
           localStorage.setItem("companyPhone", importedData.companyPhone);
         if (importedData.vatNote)
           localStorage.setItem("vatNote", importedData.vatNote);
-        if (importedData.mbo)
-          localStorage.setItem("mbo", importedData.mbo);
+        if (importedData.mbo) localStorage.setItem("mbo", importedData.mbo);
         if (importedData.customers)
           localStorage.setItem("savedCustomers", importedData.customers);
 
@@ -257,7 +254,10 @@ export default function SettingsComponent() {
           setCustomers(getCustomers());
         }
       } catch (error) {
-        showToast("Došlo je do greške prilikom uvoza podataka. Provjerite je li datoteka ispravna.", "error");
+        showToast(
+          "Došlo je do greške prilikom uvoza podataka. Provjerite je li datoteka ispravna.",
+          "error"
+        );
       }
     };
     reader.readAsText(file);
@@ -297,13 +297,13 @@ export default function SettingsComponent() {
       }
     }
 
-          showToast("Naziv obrta je uspješno spremljen.", "success");
+    showToast("Naziv obrta je uspješno spremljen.", "success");
   };
 
   const handleBankNameChange = (value: string) => {
     setBankName(value);
     localStorage.setItem("bankName", value);
-          showToast("Naziv banke je uspješno spremljen.", "success");
+    showToast("Naziv banke je uspješno spremljen.", "success");
   };
 
   const handleCompanyFullNameChange = (value: string) => {
@@ -321,13 +321,13 @@ export default function SettingsComponent() {
   const handleCompanyStreetChange = (value: string) => {
     setCompanyStreet(value);
     localStorage.setItem("companyStreet", value);
-          showToast("Ulica je uspješno spremljena.", "success");
+    showToast("Ulica je uspješno spremljena.", "success");
   };
 
   const handleCompanyHouseNumberChange = (value: string) => {
     setCompanyHouseNumber(value);
     localStorage.setItem("companyHouseNumber", value);
-          showToast("Kućni broj je uspješno spremljen.", "success");
+    showToast("Kućni broj je uspješno spremljen.", "success");
   };
 
   const handleCompanyPostalCodeChange = (value: string) => {
@@ -339,7 +339,7 @@ export default function SettingsComponent() {
   const handleCompanyCityChange = (value: string) => {
     setCompanyCity(value);
     localStorage.setItem("companyCity", value);
-          showToast("Grad je uspješno spremljen.", "success");
+    showToast("Grad je uspješno spremljen.", "success");
   };
 
   const handleCompanyAccountNumberChange = (value: string) => {
@@ -377,13 +377,13 @@ export default function SettingsComponent() {
   const handleVatNoteChange = (value: string) => {
     setVatNote(value);
     localStorage.setItem("vatNote", value);
-          showToast("Napomena je uspješno spremljena.", "success");
+    showToast("Napomena je uspješno spremljena.", "success");
   };
 
   const handleMboChange = (value: string) => {
     setMbo(value);
     localStorage.setItem("mbo", value);
-          showToast("MBO je uspješno spremljen.", "success");
+    showToast("MBO je uspješno spremljen.", "success");
   };
 
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -415,7 +415,7 @@ export default function SettingsComponent() {
   const handleRemoveLogo = () => {
     setCompanyLogo("");
     localStorage.removeItem("companyLogo");
-          showToast("Logo je uklonjen.", "success");
+    showToast("Logo je uklonjen.", "success");
   };
 
   const handleClearCustomers = () => {
@@ -491,7 +491,7 @@ export default function SettingsComponent() {
       }
     }
 
-          showToast("Podatci o obrtu su obrisani.", "success");
+    showToast("Podatci o obrtu su obrisani.", "success");
   };
 
   const getStorageInfo = () => {
@@ -504,7 +504,6 @@ export default function SettingsComponent() {
 
   return (
     <div className="space-y-6">
-
       <Tabs defaultValue="company" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="company" className="flex items-center gap-2">
@@ -535,6 +534,123 @@ export default function SettingsComponent() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Osnovne postavke */}
+              <div className="space-y-4">
+                <div
+                  className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                  onClick={() =>
+                    setIsOtherSettingsExpanded(!isOtherSettingsExpanded)
+                  }
+                >
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Osnovne postavke
+                  </h3>
+                  {isOtherSettingsExpanded ? (
+                    <ChevronUp className="h-5 w-5 text-gray-500" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5 text-gray-500" />
+                  )}
+                </div>
+
+                {isOtherSettingsExpanded && (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="company-full-name">
+                        Dugi naziv obrta
+                      </Label>
+                      <Input
+                        id="company-full-name"
+                        value={companyFullName}
+                        onChange={(e) =>
+                          handleCompanyFullNameChange(e.target.value)
+                        }
+                        placeholder="npr. Ime Obrta, vl. Mate Matic"
+                      />
+                      <p className="text-sm text-gray-500">
+                        Pun naziv obrta koji će se koristiti u PDF računima i
+                        prilikom generiranja barkoda
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="company-account-number">
+                        Broj računa obrta
+                      </Label>
+                      <Input
+                        id="company-account-number"
+                        value={companyAccountNumber}
+                        onChange={(e) =>
+                          handleCompanyAccountNumberChange(e.target.value)
+                        }
+                        placeholder="npr. HR1234567890123456789"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="company-oib">OIB obrta</Label>
+                      <Input
+                        id="company-oib"
+                        value={companyOIB}
+                        onChange={(e) => handleCompanyOIBChange(e.target.value)}
+                        placeholder="npr. 12345678901"
+                      />{" "}
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="company-street">Ulica</Label>
+                        <Input
+                          id="company-street"
+                          value={companyStreet}
+                          onChange={(e) =>
+                            handleCompanyStreetChange(e.target.value)
+                          }
+                          placeholder="npr. Ilica"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="company-house-number">Kućni broj</Label>
+                        <Input
+                          id="company-house-number"
+                          value={companyHouseNumber}
+                          onChange={(e) =>
+                            handleCompanyHouseNumberChange(e.target.value)
+                          }
+                          placeholder="npr. 123"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="company-postal-code">
+                          Poštanski broj
+                        </Label>
+                        <Input
+                          id="company-postal-code"
+                          value={companyPostalCode}
+                          onChange={(e) =>
+                            handleCompanyPostalCodeChange(e.target.value)
+                          }
+                          placeholder="npr. 10000"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="company-city">Grad</Label>
+                        <Input
+                          id="company-city"
+                          value={companyCity}
+                          onChange={(e) =>
+                            handleCompanyCityChange(e.target.value)
+                          }
+                          placeholder="npr. Zagreb"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Postavke generiranog računa */}
               <div className="space-y-4">
                 <div
@@ -685,126 +801,6 @@ export default function SettingsComponent() {
                       <p className="text-sm text-gray-500">
                         Naziv banke koji će se prikazati u zaglavlju računa
                       </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Ostale postavke */}
-              <div className="space-y-4">
-                <div
-                  className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
-                  onClick={() =>
-                    setIsOtherSettingsExpanded(!isOtherSettingsExpanded)
-                  }
-                >
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    Ostale postavke
-                  </h3>
-                  {isOtherSettingsExpanded ? (
-                    <ChevronUp className="h-5 w-5 text-gray-500" />
-                  ) : (
-                    <ChevronDown className="h-5 w-5 text-gray-500" />
-                  )}
-                </div>
-
-                {isOtherSettingsExpanded && (
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="company-full-name">
-                        Dugi naziv obrta
-                      </Label>
-                      <Input
-                        id="company-full-name"
-                        value={companyFullName}
-                        onChange={(e) =>
-                          handleCompanyFullNameChange(e.target.value)
-                        }
-                        placeholder="npr. Ime Obrta, vl. Mate Matic"
-                      />
-                      <p className="text-sm text-gray-500">
-                        Pun naziv obrta koji će se koristiti u PDF računima
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="company-account-number">
-                        Broj računa obrta
-                      </Label>
-                      <Input
-                        id="company-account-number"
-                        value={companyAccountNumber}
-                        onChange={(e) =>
-                          handleCompanyAccountNumberChange(e.target.value)
-                        }
-                        placeholder="npr. HR1234567890123456789"
-                      />
-                      <p className="text-sm text-gray-500">
-                        IBAN broj računa obrta
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="company-oib">OIB obrta</Label>
-                      <Input
-                        id="company-oib"
-                        value={companyOIB}
-                        onChange={(e) => handleCompanyOIBChange(e.target.value)}
-                        placeholder="npr. 12345678901"
-                      />
-                      <p className="text-sm text-gray-500">OIB broj obrta</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="company-street">Ulica</Label>
-                        <Input
-                          id="company-street"
-                          value={companyStreet}
-                          onChange={(e) =>
-                            handleCompanyStreetChange(e.target.value)
-                          }
-                          placeholder="npr. Ilica"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="company-house-number">Kućni broj</Label>
-                        <Input
-                          id="company-house-number"
-                          value={companyHouseNumber}
-                          onChange={(e) =>
-                            handleCompanyHouseNumberChange(e.target.value)
-                          }
-                          placeholder="npr. 123"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="company-postal-code">
-                          Poštanski broj
-                        </Label>
-                        <Input
-                          id="company-postal-code"
-                          value={companyPostalCode}
-                          onChange={(e) =>
-                            handleCompanyPostalCodeChange(e.target.value)
-                          }
-                          placeholder="npr. 10000"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="company-city">Grad</Label>
-                        <Input
-                          id="company-city"
-                          value={companyCity}
-                          onChange={(e) =>
-                            handleCompanyCityChange(e.target.value)
-                          }
-                          placeholder="npr. Zagreb"
-                        />
-                      </div>
                     </div>
                   </div>
                 )}
