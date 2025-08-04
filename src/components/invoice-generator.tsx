@@ -615,7 +615,7 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
         {/* Company Information */}
         <Card>
           <CardHeader
-            className="cursor-pointer hover:bg-gray-50 transition-colors"
+            className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             onClick={() => setIsCompanyInfoExpanded(!isCompanyInfoExpanded)}
           >
             <div className="flex items-center justify-between">
@@ -690,7 +690,7 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
         {/* Customer Information */}
         <Card>
           <CardHeader
-            className="cursor-pointer hover:bg-gray-50 transition-colors"
+            className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             onClick={() => setIsCustomerInfoExpanded(!isCustomerInfoExpanded)}
           >
             <div className="flex items-center justify-between">
@@ -808,7 +808,7 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
             </div>
 
             {formData.items.map((item, index) => (
-              <div key={item.id} className="border rounded-lg p-4 bg-gray-50">
+              <div key={item.id} className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
                 <div className="flex justify-between items-start mb-4">
                   <h4 className="font-medium">Stavka {index + 1}</h4>
                   {formData.items.length > 1 && (
@@ -861,9 +861,9 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
                         className="font-mono"
                       />
                       <div className="flex justify-between items-center mt-1">
-                        <p className="text-sm text-gray-500">Unesite iznos u EUR</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Unesite iznos u EUR</p>
                         {item.cijenaPoJedinici > 0 && (
-                          <p className="text-sm text-blue-600 font-medium">
+                          <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
                             {formatAmountForDisplay(item.cijenaPoJedinici)} EUR
                           </p>
                         )}
@@ -874,7 +874,7 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
                       <Input 
                         value={((item.cijenaPoJedinici * item.kolicina) / 100).toFixed(2).replace(".", ",")} 
                         disabled 
-                        className="bg-gray-100 font-mono" 
+                        className="bg-gray-100 dark:bg-gray-700 font-mono" 
                       />
                     </div>
                   </div>
@@ -886,7 +886,7 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
             <div className="flex justify-end">
               <div className="text-right">
                 <Label className="text-lg font-semibold">Ukupan iznos računa</Label>
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {(totalAmount / 100).toFixed(2).replace(".", ",")} EUR
                 </div>
               </div>
@@ -986,7 +986,7 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
             <DialogTitle>Pregled računa</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-4">
-            <div className="border rounded-lg p-4 bg-gray-50 overflow-auto flex-1" style={{ maxHeight: "60vh" }}>
+            <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 overflow-auto flex-1" style={{ maxHeight: "60vh" }}>
               <div className="pdf-preview">
                 <PDFPreview invoiceData={formData} />
               </div>

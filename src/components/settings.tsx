@@ -30,6 +30,7 @@ import {
   clearCustomers,
   type Customer,
 } from "@/utils/customerStorage";
+import { ThemeToggle } from "./theme-toggle";
 
 export default function SettingsComponent() {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -537,12 +538,12 @@ export default function SettingsComponent() {
               {/* Osnovne postavke */}
               <div className="space-y-4">
                 <div
-                  className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                  className="flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors"
                   onClick={() =>
                     setIsOtherSettingsExpanded(!isOtherSettingsExpanded)
                   }
                 >
-                  <h3 className="text-lg font-semibold text-gray-800">
+                  <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                     Osnovne postavke
                   </h3>
                   {isOtherSettingsExpanded ? (
@@ -566,7 +567,7 @@ export default function SettingsComponent() {
                         }
                         placeholder="npr. Ime Obrta, vl. Mate Matic"
                       />
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         Pun naziv obrta koji će se koristiti u PDF računima i
                         prilikom generiranja barkoda
                       </p>
@@ -654,12 +655,12 @@ export default function SettingsComponent() {
               {/* Postavke generiranog računa */}
               <div className="space-y-4">
                 <div
-                  className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                  className="flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors"
                   onClick={() =>
                     setIsInvoiceSettingsExpanded(!isInvoiceSettingsExpanded)
                   }
                 >
-                  <h3 className="text-lg font-semibold text-gray-800">
+                  <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                     Postavke generiranog računa (PDF prikaz)
                   </h3>
                   {isInvoiceSettingsExpanded ? (
@@ -691,9 +692,9 @@ export default function SettingsComponent() {
                               Ukloni logo
                             </Button>
                           </div>
-                          <p className="text-sm text-gray-500">
-                            Logo je učitan i bit će prikazan u PDF računima
-                          </p>
+                                                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Logo je učitan i bit će prikazan u PDF računima
+                        </p>
                         </div>
                       ) : (
                         <div className="space-y-2">
@@ -709,7 +710,7 @@ export default function SettingsComponent() {
                               />
                             </div>
                           </div>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
                             Podržani formati: JPG, PNG, GIF. Maksimalna
                             veličina: 2MB
                           </p>
@@ -727,7 +728,7 @@ export default function SettingsComponent() {
                         }
                         placeholder="Unesite naziv vašeg obrta"
                       />
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         Kratki naziv koji će se prikazati ispod loga
                       </p>
                     </div>
@@ -742,7 +743,7 @@ export default function SettingsComponent() {
                         }
                         placeholder="npr. Mate Matic"
                       />
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         Ime osobe koja je izdala račun
                       </p>
                     </div>
@@ -757,7 +758,7 @@ export default function SettingsComponent() {
                         }
                         placeholder="npr. +385 1 2345 678"
                       />
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         Broj telefona koji će se prikazati u računu
                       </p>
                     </div>
@@ -771,7 +772,7 @@ export default function SettingsComponent() {
                         placeholder="Unesite napomenu koja će se prikazati u PDF računima"
                         rows={3}
                       />
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         Napomena koja će se prikazati u računu ispod popisa
                         stavki
                       </p>
@@ -785,7 +786,7 @@ export default function SettingsComponent() {
                         onChange={(e) => handleMboChange(e.target.value)}
                         placeholder="npr. 12345678"
                       />
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         Matični broj obrta koji će se prikazati u računu
                       </p>
                     </div>
@@ -798,7 +799,7 @@ export default function SettingsComponent() {
                         onChange={(e) => handleBankNameChange(e.target.value)}
                         placeholder="npr. Otp Banka d.d."
                       />
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         Naziv banke koji će se prikazati u zaglavlju računa
                       </p>
                     </div>
@@ -830,7 +831,7 @@ export default function SettingsComponent() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>Spremljeni kupci</Label>
-                <div className="text-sm text-gray-600 space-y-1">
+                <div className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
                   <p>Broj kupaca: {customers.length}</p>
                   <p>Kupci se automatski spremaju kada generirate račun</p>
                 </div>
@@ -854,14 +855,14 @@ export default function SettingsComponent() {
                     {customers.map((customer) => (
                       <div
                         key={customer.id}
-                        className="text-sm p-2 bg-gray-50 rounded"
+                        className="text-sm p-2 bg-gray-50 dark:bg-gray-800 rounded"
                       >
                         <div className="font-medium">{customer.name}</div>
-                        <div className="text-gray-600">{customer.address}</div>
-                        <div className="text-gray-600">
+                        <div className="text-gray-600 dark:text-gray-300">{customer.address}</div>
+                        <div className="text-gray-600 dark:text-gray-300">
                           {customer.postalCode} {customer.city}
                         </div>
-                        <div className="text-gray-500">OIB: {customer.oib}</div>
+                        <div className="text-gray-500 dark:text-gray-400">OIB: {customer.oib}</div>
                       </div>
                     ))}
                   </div>
@@ -883,7 +884,7 @@ export default function SettingsComponent() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>Informacije o pohranjenim podatcima</Label>
-                <div className="text-sm text-gray-600 space-y-1">
+                <div className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
                   <p>Broj stavki: {storageInfo.itemCount}</p>
                   <p>
                     Ukupna veličina: {(storageInfo.totalSize / 1024).toFixed(2)}{" "}
@@ -938,12 +939,12 @@ export default function SettingsComponent() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>Verzija aplikacije</Label>
-                <p className="text-sm text-gray-600">1.0.0</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">1.0.0</p>
               </div>
 
               <div className="space-y-2">
                 <Label>Funkcionalnosti</Label>
-                <div className="text-sm text-gray-600 space-y-1">
+                <div className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
                   <div className="flex items-center gap-2">
                     <QrCode className="h-3 w-3" />
                     <span>Generiranje PDF417 barkodova</span>
@@ -961,10 +962,20 @@ export default function SettingsComponent() {
 
               <div className="space-y-2">
                 <Label>Podržani formati</Label>
-                <div className="text-sm text-gray-600 space-y-1">
+                <div className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
                   <p>• PDF417 barkodovi</p>
                   <p>• PDF računi</p>
                   <p>• JSON backup datoteke</p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Način prikaza</Label>
+                <div className="flex items-center gap-2">
+                  <ThemeToggle />
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    Promijenite između svijetlog i tamnog načina rada
+                  </p>
                 </div>
               </div>
             </CardContent>

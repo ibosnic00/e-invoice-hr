@@ -8,7 +8,16 @@ export const generateBarcode = (paymentParams: PaymentParams, barcodeRef: React.
 
         // Draw the barcode directly on the canvas
         if (barcodeRef.current) {
-            PDF417.draw(barcodeString, barcodeRef.current, 5); // Use PDF417.draw to render the barcode with larger scale
+            const canvas = barcodeRef.current;
+            const ctx = canvas.getContext('2d');
+            
+            // Clear the canvas and set white background
+            if (ctx) {
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            PDF417.draw(barcodeString, canvas, 5); // Use PDF417.draw to render the barcode with larger scale
         } else {
             console.error("Failed to get canvas reference.");
         }

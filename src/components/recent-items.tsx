@@ -120,7 +120,7 @@ export default function RecentItems({ type, onLoadData, onScrollToTop }: RecentI
         </CardHeader>
         <div className="px-6 pb-6 space-y-3">
           {recentItems.map((item) => (
-            <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <Badge variant={item.type === "barcode" ? "default" : "secondary"} className="text-xs">
@@ -128,18 +128,18 @@ export default function RecentItems({ type, onLoadData, onScrollToTop }: RecentI
                   </Badge>
                   <p className="text-sm font-medium truncate">{getItemTitle(item)}</p>
                 </div>
-                <p className="text-xs text-gray-600 truncate">{getItemDescription(item)}</p>
-                <p className="text-xs text-gray-400">{formatDate(item.timestamp)}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-300 truncate">{getItemDescription(item)}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">{formatDate(item.timestamp)}</p>
               </div>
                            <div className="flex items-center gap-1 ml-2">
-                 <Button 
-                   onClick={() => handleLoadItem(item)} 
-                   variant="outline" 
-                   size="sm"
-                   className="text-xs"
-                 >
-                   Ponovno učitaj
-                 </Button>
+                                    <Button 
+                     onClick={() => handleLoadItem(item)} 
+                     variant="outline" 
+                     size="sm"
+                     className="text-xs dark:text-white"
+                   >
+                     Ponovno učitaj
+                   </Button>
                  <Dialog>
                    <DialogTrigger asChild>
                      <Button variant="ghost" size="sm">
@@ -150,11 +150,11 @@ export default function RecentItems({ type, onLoadData, onScrollToTop }: RecentI
                      <DialogHeader>
                        <DialogTitle>Detalji stavke</DialogTitle>
                      </DialogHeader>
-                     <div className="space-y-2">
-                       <pre className="text-xs bg-gray-100 p-4 rounded overflow-x-auto">
-                         {JSON.stringify(item.data, null, 2)}
-                       </pre>
-                     </div>
+                                            <div className="space-y-2">
+                         <pre className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-4 rounded overflow-x-auto">
+                           {JSON.stringify(item.data, null, 2)}
+                         </pre>
+                       </div>
                    </DialogContent>
                  </Dialog>
                  <Button 

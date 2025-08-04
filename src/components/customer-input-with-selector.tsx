@@ -76,7 +76,7 @@ export default function CustomerInputWithSelector({
                 type="button"
                 variant="ghost" 
                 size="sm"
-                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 hover:bg-gray-100"
+                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
               >
                 <ChevronDown className="h-4 w-4" />
               </Button>
@@ -87,16 +87,16 @@ export default function CustomerInputWithSelector({
               </DialogHeader>
               {customers.length === 0 ? (
                 <div className="text-center py-8">
-                  <Users className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-500">Nema spremljenih kupaca</p>
-                  <p className="text-sm text-gray-400 mt-2">
+                  <Users className="h-12 w-12 mx-auto text-gray-400 dark:text-gray-500 mb-4" />
+                  <p className="text-gray-500 dark:text-gray-400">Nema spremljenih kupaca</p>
+                  <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
                     Kupci će se automatski spremiti kada generirate račun
                   </p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {customers.map((customer) => (
-                    <Card key={customer.id} className="cursor-pointer hover:bg-gray-50" 
+                    <Card key={customer.id} className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800" 
                           onClick={() => handleSelectCustomer(customer)}>
                       <CardHeader className="pb-3">
                         <div className="flex justify-between items-start">
@@ -105,12 +105,12 @@ export default function CustomerInputWithSelector({
                               <User className="h-4 w-4" />
                               {customer.name}
                             </CardTitle>
-                            <div className="text-sm text-gray-600 mt-1 space-y-1">
+                            <div className="text-sm text-gray-600 dark:text-gray-300 mt-1 space-y-1">
                               <p>{customer.address}</p>
                               <p>{customer.postalCode} {customer.city}</p>
                               <p>OIB: {customer.oib}</p>
                             </div>
-                            <p className="text-xs text-gray-400 mt-2">
+                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
                               Dodano: {formatDate(customer.timestamp)}
                             </p>
                           </div>

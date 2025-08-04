@@ -108,8 +108,8 @@ export default function LastGeneratedItems({
   if (history.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500 text-lg mb-4">Nema zadnjih generiranih stavki</p>
-        <p className="text-gray-400">Generirajte barkod ili račun da biste vidjeli povijest</p>
+        <p className="text-gray-500 dark:text-gray-400 text-lg mb-4">Nema zadnjih generiranih stavki</p>
+        <p className="text-gray-400 dark:text-gray-500">Generirajte barkod ili račun da biste vidjeli povijest</p>
       </div>
     )
   }
@@ -131,8 +131,8 @@ export default function LastGeneratedItems({
               <div className="flex justify-between items-start">
                 <div>
                   <CardTitle className="text-base">{getItemTitle(item)}</CardTitle>
-                  <p className="text-sm text-gray-600 mt-1">{getItemDescription(item)}</p>
-                  <p className="text-xs text-gray-400 mt-1">{formatDate(item.timestamp)}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{getItemDescription(item)}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{formatDate(item.timestamp)}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant={item.type === "barcode" ? "default" : "secondary"}>
@@ -156,11 +156,11 @@ export default function LastGeneratedItems({
                       <DialogHeader>
                         <DialogTitle>Detalji stavke</DialogTitle>
                       </DialogHeader>
-                      <div className="space-y-2">
-                        <pre className="text-xs bg-gray-100 p-4 rounded overflow-x-auto">
-                          {JSON.stringify(item.data, null, 2)}
-                        </pre>
-                      </div>
+                                             <div className="space-y-2">
+                         <pre className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-4 rounded overflow-x-auto">
+                           {JSON.stringify(item.data, null, 2)}
+                         </pre>
+                       </div>
                     </DialogContent>
                   </Dialog>
                   <Button onClick={() => handleRemoveItem(item)} variant="ghost" size="sm">

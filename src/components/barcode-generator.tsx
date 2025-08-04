@@ -245,6 +245,7 @@ const BarcodeGenerator = forwardRef<any, {}>((props, ref) => {
         }
       }
 
+      // Generate barcode
       validateInputAndGenerateBarcode(formData, barcodeRef)
 
       // Scale the generated barcode to be larger
@@ -420,9 +421,9 @@ const BarcodeGenerator = forwardRef<any, {}>((props, ref) => {
                   className="font-mono"
                 />
                 <div className="flex justify-between items-center mt-1">
-                  <p className="text-sm text-gray-500">Unesite iznos u EUR. Npr.: 9,50 EUR</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Unesite iznos u EUR. Npr.: 9,50 EUR</p>
                   {formData.Iznos > 0 && (
-                    <p className="text-sm text-blue-600 font-medium">{formatAmountForDisplay(formData.Iznos)} EUR</p>
+                    <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">{formatAmountForDisplay(formData.Iznos)} EUR</p>
                   )}
                 </div>
               </div>
@@ -473,7 +474,7 @@ const BarcodeGenerator = forwardRef<any, {}>((props, ref) => {
         {/* Optional Fields */}
         <Card>
           <CardHeader
-            className="cursor-pointer hover:bg-gray-50 transition-colors"
+            className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             onClick={() => setIsOptionalFieldsExpanded(!isOptionalFieldsExpanded)}
           >
             <div className="flex items-center justify-between">
@@ -657,8 +658,8 @@ const BarcodeGenerator = forwardRef<any, {}>((props, ref) => {
         <CardContent className="flex justify-center">
           <canvas
             ref={barcodeRef}
-            className="max-w-full"
-            style={{ maxWidth: "100%", height: "auto" }}
+            className="max-w-full bg-white"
+            style={{ maxWidth: "100%", height: hasBarcode ? "auto" : "0px" }}
           />
         </CardContent>
       </Card>

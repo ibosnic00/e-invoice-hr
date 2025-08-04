@@ -74,10 +74,10 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+  <div className="min-h-screen bg-blue-50 dark:bg-gray-900 p-4">      
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
-          <p className="text-lg text-gray-600">Generirajte barkodove za plaćanja i PDF račune</p>
+          <p className="text-lg text-gray-600 dark:text-gray-300">Generirajte barkodove za plaćanja i PDF račune</p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
