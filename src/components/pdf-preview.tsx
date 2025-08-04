@@ -17,19 +17,26 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({ invoiceData }) => {
   const vatNote = localStorage.getItem('vatNote') || 'PDV nije obračunat sukladno članku 90. stavku 1. i stavku 2. Zakona o PDV-u - mali porezni obveznik.';
 
   // Calculate total amount
-  const totalAmount = invoiceData.kolicina * (invoiceData.cijenaPoJedinici / 100);
+  const totalAmount = invoiceData.items ? invoiceData.items.reduce((sum, item) => sum + (item.cijenaPoJedinici * item.kolicina), 0) / 100 : 0;
 
   // Generate barcode data for display
   const generateBarcodeData = () => {
     try {
-             const barcodeString = generateBarcodeString({
-         IBAN: invoiceData.brojRacunaObrta,
-         Primatelj: invoiceData.imeFirme,
-         Iznos: invoiceData.kolicina * (invoiceData.cijenaPoJedinici),
-         ModelPlacanja: invoiceData.model || "00",
-         PozivNaBroj: invoiceData.pozivNaBroj || invoiceData.brojRacuna,
-         OpisPlacanja: invoiceData.nazivRobeUsluge.substring(0, 34)
-       });
+                     // Create description for barcode from items
+        const opisPlacanja = invoiceData.items && invoiceData.items.length > 0 
+          ? invoiceData.items[0].nazivRobeUsluge.substring(0, 34)
+          : (invoiceData.items[0].nazivRobeUsluge || "Racun").substring(0, 34);
+
+        const barcodeString = generateBarcodeString({
+          IBAN: invoiceData.brojRacunaObrta,
+          Primatelj: invoiceData.imeFirme,
+          Iznos: invoiceData.items ? 
+          invoiceData.items.reduce((sum, item) => sum + (item.cijenaPoJedinici * item.kolicina), 0) : 
+          0,
+          ModelPlacanja: invoiceData.model || "00",
+          PozivNaBroj: invoiceData.pozivNaBroj || invoiceData.brojRacuna,
+          OpisPlacanja: opisPlacanja
+        });
 
       // Create a temporary canvas to generate barcode image
       const canvas = document.createElement('canvas');
@@ -139,19 +146,38 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({ invoiceData }) => {
         </div>
 
         {/* Table Content */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: '50px 1fr 80px 100px 100px',
-          padding: '8px 0',
-          fontSize: '9px',
-          borderBottom: '1px solid #ddd'
-        }}>
-          <div style={{ padding: '0 5px' }}>1.</div>
-          <div style={{ padding: '0 5px' }}>{invoiceData.nazivRobeUsluge}</div>
-          <div style={{ padding: '0 5px' }}>{invoiceData.kolicina}</div>
-          <div style={{ padding: '0 5px' }}>{(invoiceData.cijenaPoJedinici / 100).toFixed(2)} EUR</div>
-          <div style={{ padding: '0 5px' }}>{totalAmount.toFixed(2)} EUR</div>
-        </div>
+        {invoiceData.items && invoiceData.items.length > 0 ? (
+          invoiceData.items.map((item, index) => (
+            <div key={item.id} style={{ 
+              display: 'grid', 
+              gridTemplateColumns: '50px 1fr 80px 100px 100px',
+              padding: '8px 0',
+              fontSize: '9px',
+              borderBottom: index === invoiceData.items.length - 1 ? '1px solid #ddd' : 'none'
+            }}>
+              <div style={{ padding: '0 5px' }}>{index + 1}.</div>
+              <div style={{ padding: '0 5px' }}>{item.nazivRobeUsluge}</div>
+              <div style={{ padding: '0 5px' }}>{item.kolicina}</div>
+              <div style={{ padding: '0 5px' }}>{(item.cijenaPoJedinici / 100).toFixed(2)} EUR</div>
+              <div style={{ padding: '0 5px' }}>{((item.cijenaPoJedinici * item.kolicina) / 100).toFixed(2)} EUR</div>
+            </div>
+          ))
+        ) : (
+          // Fallback for backward compatibility with single item
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: '50px 1fr 80px 100px 100px',
+            padding: '8px 0',
+            fontSize: '9px',
+            borderBottom: '1px solid #ddd'
+          }}>
+            <div style={{ padding: '0 5px' }}>1.</div>
+            <div style={{ padding: '0 5px' }}>{'N/A'}</div>
+            <div style={{ padding: '0 5px' }}>{0}</div>
+            <div style={{ padding: '0 5px' }}>{0} EUR</div>
+            <div style={{ padding: '0 5px' }}>{totalAmount.toFixed(2)} EUR</div>
+          </div>
+        )}
       </div>
 
       {/* Total Amount */}

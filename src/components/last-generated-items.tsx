@@ -78,8 +78,20 @@ export default function LastGeneratedItems({
       return `${amountInEUR} EUR - ${data.OpisPlacanja}`
     } else {
       const data = item.data as any
-      const total = data.kolicina * data.cijenaPoJedinici
-      return `${total.toFixed(2).replace('.', ',')} EUR - ${data.nazivRobeUsluge}`
+      // Handle new items structure or fallback to old structure
+      let total = 0
+      let description = ""
+      
+      if (data.items && data.items.length > 0) {
+        total = data.items.reduce((sum: number, item: any) => sum + (item.cijenaPoJedinici * item.kolicina), 0)
+        description = data.items[0].nazivRobeUsluge
+      } else {
+        // Fallback for old structure
+        total = data.kolicina * data.cijenaPoJedinici
+        description = data.nazivRobeUsluge
+      }
+      
+      return `${(total / 100).toFixed(2).replace('.', ',')} EUR - ${description}`
     }
   }
 

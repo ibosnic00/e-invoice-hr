@@ -17,6 +17,14 @@ export interface BarcodePaymentData {
   SifraNamjene?: string; // Optional intent code
 }
 
+// Individual invoice item
+export interface InvoiceItem {
+  id: string;
+  nazivRobeUsluge: string;
+  kolicina: number;
+  cijenaPoJedinici: number;
+}
+
 // Data needed for PDF generation (invoice information)
 export interface InvoiceData {
   // Company information
@@ -38,10 +46,8 @@ export interface InvoiceData {
   mjestoIDatumIsporuke: string;
   datumPlacanja: string;
   
-  // Product/Service information
-  nazivRobeUsluge: string;
-  kolicina: number;
-  cijenaPoJedinici: number;
+  // Product/Service information - now supports multiple items
+  items: InvoiceItem[];
   
   // Payment information
   brojRacunaObrta: string;

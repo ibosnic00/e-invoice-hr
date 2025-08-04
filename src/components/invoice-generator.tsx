@@ -26,9 +26,12 @@ interface InvoiceData {
   vrijemeIzdavanja: string
   mjestoIDatumIsporuke: string
   datumPlacanja: string
-  nazivRobeUsluge: string
-  kolicina: number
-  cijenaPoJedinici: number
+  items: Array<{
+    id: string
+    nazivRobeUsluge: string
+    kolicina: number
+    cijenaPoJedinici: number
+  }>
   brojRacunaObrta: string
   brojRacuna: string
   pozivNaBroj: string
@@ -82,9 +85,12 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
     vrijemeIzdavanja: new Date().toLocaleTimeString("hr-HR"),
     mjestoIDatumIsporuke: new Date().toLocaleDateString("hr-HR"),
     datumPlacanja: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString("hr-HR"),
-    nazivRobeUsluge: "",
-    kolicina: 1,
-    cijenaPoJedinici: 0,
+    items: [{
+      id: "1",
+      nazivRobeUsluge: "",
+      kolicina: 1,
+      cijenaPoJedinici: 0
+    }],
     brojRacunaObrta: "",
     brojRacuna: "",
     pozivNaBroj: "",
@@ -97,15 +103,38 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
   const [isCompanyInfoExpanded, setIsCompanyInfoExpanded] = useState(false)
   const [isCustomerInfoExpanded, setIsCustomerInfoExpanded] = useState(false)
   const [isDataLoadedFromHistory, setIsDataLoadedFromHistory] = useState(false)
+  const [itemPriceDisplays, setItemPriceDisplays] = useState<{ [key: string]: string }>({})
 
   // Expose loadData method to parent component
   useImperativeHandle(ref, () => ({
     loadData: (data: InvoiceData) => {
-      setFormData(data)
-      // Convert price from cents to display format
-      if (data.cijenaPoJedinici) {
-        setPriceDisplay(formatAmountForDisplay(data.cijenaPoJedinici))
+      // Handle backward compatibility - convert old single item structure to new items structure
+      let processedData = data
+      
+      if (!data.items && (data as any).nazivRobeUsluge) {
+        // Convert old structure to new structure
+        processedData = {
+          ...data,
+          items: [{
+            id: "1",
+            nazivRobeUsluge: (data as any).nazivRobeUsluge,
+            kolicina: (data as any).kolicina || 1,
+            cijenaPoJedinici: (data as any).cijenaPoJedinici || 0
+          }]
+        }
       }
+      
+      setFormData(processedData)
+      
+      // Initialize price displays for items
+      if (processedData.items) {
+        const displays: { [key: string]: string } = {}
+        processedData.items.forEach(item => {
+          displays[item.id] = formatAmountForDisplay(item.cijenaPoJedinici)
+        })
+        setItemPriceDisplays(displays)
+      }
+      
       // Mark that data was loaded from history to prevent localStorage override
       setIsDataLoadedFromHistory(true)
     },
@@ -119,8 +148,35 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
       if (savedData) {
         try {
           const parsedData = JSON.parse(savedData)
-          setFormData(parsedData.formData)
+          
+          // Handle backward compatibility for localStorage data
+          let formDataToSet = parsedData.formData
+          if (!formDataToSet.items && (formDataToSet as any).nazivRobeUsluge) {
+            // Convert old structure to new structure
+            formDataToSet = {
+              ...formDataToSet,
+              items: [{
+                id: "1",
+                nazivRobeUsluge: (formDataToSet as any).nazivRobeUsluge,
+                kolicina: (formDataToSet as any).kolicina || 1,
+                cijenaPoJedinici: (formDataToSet as any).cijenaPoJedinici || 0
+              }]
+            }
+          }
+          
+          setFormData(formDataToSet)
+          
+          // Initialize price displays for items
+          if (formDataToSet.items) {
+            const displays: { [key: string]: string } = {}
+            formDataToSet.items.forEach((item: any) => {
+              displays[item.id] = formatAmountForDisplay(item.cijenaPoJedinici)
+            })
+            setItemPriceDisplays(displays)
+          }
+          
           setPriceDisplay(parsedData.priceDisplay || "")
+          setItemPriceDisplays(parsedData.itemPriceDisplays || {})
         } catch (error) {
           console.error("Error loading saved invoice data:", error)
         }
@@ -139,16 +195,17 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
     }
   }, [isDataLoadedFromHistory])
 
-  // Save data to localStorage whenever formData or priceDisplay changes
+  // Save data to localStorage whenever formData, priceDisplay, or itemPriceDisplays changes
   useEffect(() => {
     if (typeof window !== "undefined" && window.localStorage) {
       const dataToSave = {
         formData,
         priceDisplay,
+        itemPriceDisplays,
       }
       localStorage.setItem("invoiceGeneratorData", JSON.stringify(dataToSave))
     }
-  }, [formData, priceDisplay])
+  }, [formData, priceDisplay, itemPriceDisplays])
 
   // Listen for company name changes in settings
   useEffect(() => {
@@ -310,25 +367,103 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
 
   // Add ",00" when input loses focus if user entered only digits
   const handlePriceBlur = () => {
-    const currentValue = priceDisplay
-    const cleaned = currentValue.replace(/[^\d,.]/g, "")
+    if (priceDisplay) {
+      const parsedAmount = parseAmountFromDisplay(priceDisplay)
+      if (!isNaN(parsedAmount)) {
+        setFormData(prev => ({
+          ...prev,
+          cijenaPoJedinici: parsedAmount
+        }))
+        setPriceDisplay(formatAmountForDisplay(parsedAmount))
+      }
+    }
+  }
 
-    // If user entered only digits (no decimal separator), add ",00"
-    if (cleaned && !cleaned.includes(",") && !cleaned.includes(".")) {
-      const formattedValue = cleaned + ",00"
-      setPriceDisplay(formattedValue)
+  // Functions for handling multiple items
+  const addItem = () => {
+    const newId = (formData.items.length + 1).toString()
+    setFormData(prev => ({
+      ...prev,
+      items: [...prev.items, {
+        id: newId,
+        nazivRobeUsluge: "",
+        kolicina: 1,
+        cijenaPoJedinici: 0
+      }]
+    }))
+  }
 
-      // Update the numeric amount
-      const numericPrice = parseAmountFromDisplay(formattedValue)
-      setFormData((prev) => ({
+  const removeItem = (itemId: string) => {
+    if (formData.items.length > 1) {
+      setFormData(prev => ({
         ...prev,
-        cijenaPoJedinici: numericPrice,
+        items: prev.items.filter(item => item.id !== itemId)
       }))
+      // Remove price display for this item
+      setItemPriceDisplays(prev => {
+        const newDisplays = { ...prev }
+        delete newDisplays[itemId]
+        return newDisplays
+      })
+    }
+  }
+
+  const updateItem = (itemId: string, field: keyof typeof formData.items[0], value: string | number) => {
+    setFormData(prev => ({
+      ...prev,
+      items: prev.items.map(item => 
+        item.id === itemId ? { ...item, [field]: value } : item
+      )
+    }))
+  }
+
+  const handleItemPriceChange = (itemId: string, displayValue: string) => {
+    setItemPriceDisplays(prev => ({
+      ...prev,
+      [itemId]: displayValue
+    }))
+  }
+
+  const handleItemPriceBlur = (itemId: string) => {
+    const displayValue = itemPriceDisplays[itemId]
+    if (displayValue) {
+      const parsedAmount = parseAmountFromDisplay(displayValue)
+      if (!isNaN(parsedAmount)) {
+        updateItem(itemId, "cijenaPoJedinici", parsedAmount)
+        setItemPriceDisplays(prev => ({
+          ...prev,
+          [itemId]: formatAmountForDisplay(parsedAmount)
+        }))
+      }
     }
   }
 
   const handleGenerateInvoice = async () => {
     try {
+      // Validate items
+      const validationErrors: string[] = []
+      
+      if (!formData.items || formData.items.length === 0) {
+        validationErrors.push("Dodajte barem jednu stavku računa")
+      } else {
+        formData.items.forEach((item, index) => {
+          if (!item.nazivRobeUsluge.trim()) {
+            validationErrors.push(`Stavka ${index + 1}: Naziv robe/usluge je obavezan`)
+          }
+          if (item.kolicina <= 0) {
+            validationErrors.push(`Stavka ${index + 1}: Količina mora biti veća od 0`)
+          }
+          if (item.cijenaPoJedinici <= 0) {
+            validationErrors.push(`Stavka ${index + 1}: Cijena po jedinici mora biti veća od 0`)
+          }
+        })
+      }
+
+      if (validationErrors.length > 0) {
+        setErrors(validationErrors)
+        return
+      }
+
       // Generate invoice number if not set
       if (!formData.brojRacuna) {
         const currentDate = new Date()
@@ -446,9 +581,12 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
       vrijemeIzdavanja: new Date().toLocaleTimeString("hr-HR"),
       mjestoIDatumIsporuke: new Date().toLocaleDateString("hr-HR"),
       datumPlacanja: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString("hr-HR"),
-      nazivRobeUsluge: "",
-      kolicina: 1,
-      cijenaPoJedinici: 0,
+              items: [{
+          id: "1",
+          nazivRobeUsluge: "",
+          kolicina: 1,
+          cijenaPoJedinici: 0
+        }],
       brojRacunaObrta: companyAccountNumber,
       brojRacuna: "",
       pozivNaBroj: "",
@@ -466,7 +604,7 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
     }
   }
 
-  const totalAmount = formData.kolicina * (formData.cijenaPoJedinici / 100)
+  const totalAmount = formData.items.reduce((sum, item) => sum + (item.cijenaPoJedinici * item.kolicina), 0)
 
   return (
     <div className="space-y-6">
@@ -648,51 +786,107 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
 
           
 
-          <div>
-            <Label htmlFor="nazivRobeUsluge">Naziv robe/usluge *</Label>
-            <Textarea
-              id="nazivRobeUsluge"
-              value={formData.nazivRobeUsluge}
-              onChange={(e) => handleInputChange("nazivRobeUsluge", e.target.value)}
-              placeholder="Opis proizvoda ili usluge"
-              rows={3}
-            />
-          </div>
+          {/* Items Section */}
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <Label className="text-lg font-semibold">Stavke računa</Label>
+              <Button
+                type="button"
+                onClick={addItem}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Dodaj stavku
+              </Button>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="kolicina">Količina *</Label>
-              <Input
-                id="kolicina"
-                type="number"
-                min="1"
-                value={formData.kolicina}
-                onChange={(e) => handleInputChange("kolicina", Number.parseInt(e.target.value) || 1)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="cijenaPoJedinici">Cijena po jedinici (EUR) *</Label>
-              <Input
-                id="cijenaPoJedinici"
-                type="text"
-                value={priceDisplay}
-                onChange={(e) => handlePriceChange(e.target.value)}
-                onBlur={handlePriceBlur}
-                placeholder="0,00"
-                className="font-mono"
-              />
-              <div className="flex justify-between items-center mt-1">
-                <p className="text-sm text-gray-500">Unesite iznos u EUR. Npr.: 9,50 EUR</p>
-                {formData.cijenaPoJedinici > 0 && (
-                  <p className="text-sm text-blue-600 font-medium">
-                    {formatAmountForDisplay(formData.cijenaPoJedinici)} EUR
-                  </p>
-                )}
+            {formData.items.map((item, index) => (
+              <div key={item.id} className="border rounded-lg p-4 bg-gray-50">
+                <div className="flex justify-between items-start mb-4">
+                  <h4 className="font-medium">Stavka {index + 1}</h4>
+                  {formData.items.length > 1 && (
+                    <Button
+                      type="button"
+                      onClick={() => removeItem(item.id)}
+                      variant="outline"
+                      size="sm"
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </Button>
+                  )}
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor={`nazivRobeUsluge-${item.id}`}>Naziv robe/usluge *</Label>
+                    <Textarea
+                      id={`nazivRobeUsluge-${item.id}`}
+                      value={item.nazivRobeUsluge}
+                      onChange={(e) => updateItem(item.id, "nazivRobeUsluge", e.target.value)}
+                      placeholder="Opis proizvoda ili usluge"
+                      rows={2}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <Label htmlFor={`kolicina-${item.id}`}>Količina *</Label>
+                      <Input
+                        id={`kolicina-${item.id}`}
+                        type="number"
+                        min="1"
+                        value={item.kolicina}
+                        onChange={(e) => updateItem(item.id, "kolicina", Number.parseInt(e.target.value) || 1)}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor={`cijenaPoJedinici-${item.id}`}>Cijena po jedinici (EUR) *</Label>
+                      <Input
+                        id={`cijenaPoJedinici-${item.id}`}
+                        type="text"
+                        value={itemPriceDisplays[item.id] || formatAmountForDisplay(item.cijenaPoJedinici)}
+                        onChange={(e) => handleItemPriceChange(item.id, e.target.value)}
+                        onBlur={() => handleItemPriceBlur(item.id)}
+                        placeholder="0,00"
+                        className="font-mono"
+                      />
+                      <div className="flex justify-between items-center mt-1">
+                        <p className="text-sm text-gray-500">Unesite iznos u EUR</p>
+                        {item.cijenaPoJedinici > 0 && (
+                          <p className="text-sm text-blue-600 font-medium">
+                            {formatAmountForDisplay(item.cijenaPoJedinici)} EUR
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <Label>Ukupno (EUR)</Label>
+                      <Input 
+                        value={((item.cijenaPoJedinici * item.kolicina) / 100).toFixed(2).replace(".", ",")} 
+                        disabled 
+                        className="bg-gray-100 font-mono" 
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div>
-              <Label>Ukupno (EUR)</Label>
-              <Input value={totalAmount.toFixed(2).replace(".", ",")} disabled className="bg-gray-100 font-mono" />
+            ))}
+
+            {/* Total Amount */}
+            <div className="flex justify-end">
+              <div className="text-right">
+                <Label className="text-lg font-semibold">Ukupan iznos računa</Label>
+                <div className="text-2xl font-bold text-blue-600">
+                  {(totalAmount / 100).toFixed(2).replace(".", ",")} EUR
+                </div>
+              </div>
             </div>
           </div>
 

@@ -41,12 +41,22 @@ export function convertInvoiceToBarcodeData(
   modelPlacanja: string = "00",
   sifraNamjene: string = ""
 ): BarcodePaymentData {
+  // Calculate total amount from items or fallback to single item
+  const totalAmount = invoiceData.items && invoiceData.items.length > 0
+    ? invoiceData.items.reduce((sum, item) => sum + (item.cijenaPoJedinici * item.kolicina), 0)
+    : 0;
+
+  // Get description from first item or fallback to single item
+  const opisPlacanja = invoiceData.items && invoiceData.items.length > 0
+    ? invoiceData.items[0].nazivRobeUsluge
+    : "N/A";
+
   return {
     // Required fields for barcode generation
     IBAN: invoiceData.brojRacunaObrta,
     Primatelj: invoiceData.imeFirme,
-    Iznos: invoiceData.kolicina * invoiceData.cijenaPoJedinici,
-    OpisPlacanja: invoiceData.nazivRobeUsluge,
+    Iznos: totalAmount,
+    OpisPlacanja: opisPlacanja,
     ModelPlacanja: modelPlacanja,
     PozivNaBroj: invoiceData.brojRacuna || invoiceData.pozivNaBroj,
     
@@ -68,12 +78,31 @@ export function validateInvoiceData(data: InvoiceData): { isValid: boolean; miss
   // Only essential fields are required for PDF generation
   const requiredFields: (keyof InvoiceData)[] = [
     'imeFirme',           // Naziv obrta - required
-    'nazivRobeUsluge',    // Naziv robe/usluge - required
-    'kolicina',           // Količina - required
-    'cijenaPoJedinici',   // Cijena po jedinici - required
     'brojRacunaObrta',    // Broj računa obrta - required
     'brojRacuna'          // Broj računa - required
   ];
+
+  // Check if items are present and valid
+  if (!data.items || data.items.length === 0) {
+    return {
+      isValid: false,
+      missingFields: ['Stavke računa']
+    };
+  }
+
+  // Validate each item
+  const itemErrors: string[] = [];
+  data.items.forEach((item, index) => {
+    if (!item.nazivRobeUsluge || !item.nazivRobeUsluge.trim()) {
+      itemErrors.push(`Stavka ${index + 1}: Naziv robe/usluge`);
+    }
+    if (!item.kolicina || item.kolicina <= 0) {
+      itemErrors.push(`Stavka ${index + 1}: Količina`);
+    }
+    if (!item.cijenaPoJedinici || item.cijenaPoJedinici <= 0) {
+      itemErrors.push(`Stavka ${index + 1}: Cijena po jedinici`);
+    }
+  });
 
   const fieldLabels: { [key: string]: string } = {
     imeFirme: 'Naziv obrta',

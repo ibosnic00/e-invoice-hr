@@ -95,9 +95,19 @@ export const validateInvoiceAndGenerateBarcode = (
             return;
         }
 
+        // Calculate total amount from items or fallback to single item
+        const totalAmount = invoiceData.items && invoiceData.items.length > 0
+            ? invoiceData.items.reduce((sum, item) => sum + (item.cijenaPoJedinici * item.kolicina), 0)
+            : 0;
+
+        // Get description from first item or fallback to single item
+        const opisPlacanja = invoiceData.items && invoiceData.items.length > 0
+            ? invoiceData.items[0].nazivRobeUsluge
+            : "N/A";
+
         // Convert invoice data to barcode data
         const barcodeData = {
-            Iznos: invoiceData.kolicina * invoiceData.cijenaPoJedinici,
+            Iznos: totalAmount,
             ImePlatitelja: invoiceData.imeKupca,
             AdresaPlatitelja: invoiceData.adresaKupca,
             SjedistePlatitelja: invoiceData.postanskiBrojIGradKupca,
@@ -108,7 +118,7 @@ export const validateInvoiceAndGenerateBarcode = (
             ModelPlacanja: modelPlacanja,
             PozivNaBroj: invoiceData.brojRacuna || invoiceData.pozivNaBroj,
             SifraNamjene: sifraNamjene,
-            OpisPlacanja: invoiceData.nazivRobeUsluge,
+            OpisPlacanja: opisPlacanja,
         };
 
         // Validate barcode data
