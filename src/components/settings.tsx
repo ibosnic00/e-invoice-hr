@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useToast } from "@/components/ui/toast";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -33,10 +33,7 @@ import {
 
 export default function SettingsComponent() {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
+  const { showToast } = useToast();
   const [companyName, setCompanyName] = useState(
     localStorage.getItem("companyName") || ""
   );
@@ -97,16 +94,10 @@ export default function SettingsComponent() {
     try {
       // Clear all localStorage data
       localStorage.clear();
-      setMessage({
-        type: "success",
-        text: "Svi podatci su uspješno obrisani.",
-      });
+      showToast("Svi podatci su uspješno obrisani.", "success");
       setShowConfirmDelete(false);
     } catch (error) {
-      setMessage({
-        type: "error",
-        text: "Došlo je do greške prilikom brisanja podataka.",
-      });
+      showToast("Došlo je do greške prilikom brisanja podataka.", "error");
     }
   };
 
@@ -147,15 +138,9 @@ export default function SettingsComponent() {
       link.click();
       URL.revokeObjectURL(url);
 
-      setMessage({
-        type: "success",
-        text: "Podatci su uspješno eksportirani.",
-      });
+      showToast("Podatci su uspješno eksportirani.", "success");
     } catch (error) {
-      setMessage({
-        type: "error",
-        text: "Došlo je do greške prilikom eksportiranja podataka.",
-      });
+      showToast("Došlo je do greške prilikom eksportiranja podataka.", "error");
     }
   };
 
@@ -223,7 +208,7 @@ export default function SettingsComponent() {
         if (importedData.customers)
           localStorage.setItem("savedCustomers", importedData.customers);
 
-        setMessage({ type: "success", text: "Podatci su uspješno uvezeni." });
+        showToast("Podatci su uspješno uvezeni.", "success");
 
         // Update local state if company data was imported
         if (importedData.companyName) {
@@ -272,10 +257,7 @@ export default function SettingsComponent() {
           setCustomers(getCustomers());
         }
       } catch (error) {
-        setMessage({
-          type: "error",
-          text: "Došlo je do greške prilikom uvoza podataka. Provjerite je li datoteka ispravna.",
-        });
+        showToast("Došlo je do greške prilikom uvoza podataka. Provjerite je li datoteka ispravna.", "error");
       }
     };
     reader.readAsText(file);
@@ -315,67 +297,55 @@ export default function SettingsComponent() {
       }
     }
 
-    setMessage({ type: "success", text: "Naziv obrta je uspješno spremljen." });
+          showToast("Naziv obrta je uspješno spremljen.", "success");
   };
 
   const handleBankNameChange = (value: string) => {
     setBankName(value);
     localStorage.setItem("bankName", value);
-    setMessage({ type: "success", text: "Naziv banke je uspješno spremljen." });
+          showToast("Naziv banke je uspješno spremljen.", "success");
   };
 
   const handleCompanyFullNameChange = (value: string) => {
     setCompanyFullName(value);
     localStorage.setItem("companyFullName", value);
-    setMessage({
-      type: "success",
-      text: "Dugi naziv obrta je uspješno spremljen.",
-    });
+    showToast("Dugi naziv obrta je uspješno spremljen.", "success");
   };
 
   const handleInvoiceIssuerChange = (value: string) => {
     setInvoiceIssuer(value);
     localStorage.setItem("invoiceIssuer", value);
-    setMessage({
-      type: "success",
-      text: "Račun izradio je uspješno spremljen.",
-    });
+    showToast("Račun izradio je uspješno spremljen.", "success");
   };
 
   const handleCompanyStreetChange = (value: string) => {
     setCompanyStreet(value);
     localStorage.setItem("companyStreet", value);
-    setMessage({ type: "success", text: "Ulica je uspješno spremljena." });
+          showToast("Ulica je uspješno spremljena.", "success");
   };
 
   const handleCompanyHouseNumberChange = (value: string) => {
     setCompanyHouseNumber(value);
     localStorage.setItem("companyHouseNumber", value);
-    setMessage({ type: "success", text: "Kućni broj je uspješno spremljen." });
+          showToast("Kućni broj je uspješno spremljen.", "success");
   };
 
   const handleCompanyPostalCodeChange = (value: string) => {
     setCompanyPostalCode(value);
     localStorage.setItem("companyPostalCode", value);
-    setMessage({
-      type: "success",
-      text: "Poštanski broj je uspješno spremljen.",
-    });
+    showToast("Poštanski broj je uspješno spremljen.", "success");
   };
 
   const handleCompanyCityChange = (value: string) => {
     setCompanyCity(value);
     localStorage.setItem("companyCity", value);
-    setMessage({ type: "success", text: "Grad je uspješno spremljen." });
+          showToast("Grad je uspješno spremljen.", "success");
   };
 
   const handleCompanyAccountNumberChange = (value: string) => {
     setCompanyAccountNumber(value);
     localStorage.setItem("companyAccountNumber", value);
-    setMessage({
-      type: "success",
-      text: "Broj računa obrta je uspješno spremljen.",
-    });
+    showToast("Broj računa obrta je uspješno spremljen.", "success");
   };
 
   const handleCompanyOIBChange = (value: string) => {
@@ -386,46 +356,34 @@ export default function SettingsComponent() {
       const validation = validateOIB(formattedValue);
       if (validation.isValid) {
         localStorage.setItem("companyOIB", formattedValue);
-        setMessage({
-          type: "success",
-          text: "OIB obrta je uspješno spremljen.",
-        });
+        showToast("OIB obrta je uspješno spremljen.", "success");
       } else {
-        setMessage({
-          type: "error",
-          text: validation.error || "OIB nije ispravan",
-        });
+        showToast(validation.error || "OIB nije ispravan", "error");
       }
     } else if (formattedValue.length > 0) {
-      setMessage({
-        type: "error",
-        text: "OIB mora sadržavati točno 11 znamenki",
-      });
+      showToast("OIB mora sadržavati točno 11 znamenki", "error");
     } else {
       localStorage.setItem("companyOIB", formattedValue);
-      setMessage(null);
+      // No message needed for empty OIB
     }
   };
 
   const handleCompanyPhoneChange = (value: string) => {
     setCompanyPhone(value);
     localStorage.setItem("companyPhone", value);
-    setMessage({
-      type: "success",
-      text: "Broj telefona obrta je uspješno spremljen.",
-    });
+    showToast("Broj telefona obrta je uspješno spremljen.", "success");
   };
 
   const handleVatNoteChange = (value: string) => {
     setVatNote(value);
     localStorage.setItem("vatNote", value);
-    setMessage({ type: "success", text: "Napomena je uspješno spremljena." });
+          showToast("Napomena je uspješno spremljena.", "success");
   };
 
   const handleMboChange = (value: string) => {
     setMbo(value);
     localStorage.setItem("mbo", value);
-    setMessage({ type: "success", text: "MBO je uspješno spremljen." });
+          showToast("MBO je uspješno spremljen.", "success");
   };
 
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -434,19 +392,13 @@ export default function SettingsComponent() {
 
     // Check file type
     if (!file.type.startsWith("image/")) {
-      setMessage({
-        type: "error",
-        text: "Molimo odaberite sliku (JPG, PNG, GIF).",
-      });
+      showToast("Molimo odaberite sliku (JPG, PNG, GIF).", "error");
       return;
     }
 
     // Check file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
-      setMessage({
-        type: "error",
-        text: "Slika je prevelika. Maksimalna veličina je 2MB.",
-      });
+      showToast("Slika je prevelika. Maksimalna veličina je 2MB.", "error");
       return;
     }
 
@@ -455,7 +407,7 @@ export default function SettingsComponent() {
       const logoData = e.target?.result as string;
       setCompanyLogo(logoData);
       localStorage.setItem("companyLogo", logoData);
-      setMessage({ type: "success", text: "Logo je uspješno učitan." });
+      showToast("Logo je uspješno učitan.", "success");
     };
     reader.readAsDataURL(file);
   };
@@ -463,18 +415,15 @@ export default function SettingsComponent() {
   const handleRemoveLogo = () => {
     setCompanyLogo("");
     localStorage.removeItem("companyLogo");
-    setMessage({ type: "success", text: "Logo je uklonjen." });
+          showToast("Logo je uklonjen.", "success");
   };
 
   const handleClearCustomers = () => {
     if (clearCustomers()) {
       setCustomers([]);
-      setMessage({ type: "success", text: "Svi kupci su obrisani." });
+      showToast("Svi kupci su obrisani.", "success");
     } else {
-      setMessage({
-        type: "error",
-        text: "Došlo je do greške prilikom brisanja kupaca.",
-      });
+      showToast("Došlo je do greške prilikom brisanja kupaca.", "error");
     }
   };
 
@@ -542,7 +491,7 @@ export default function SettingsComponent() {
       }
     }
 
-    setMessage({ type: "success", text: "Podatci o obrtu su obrisani." });
+          showToast("Podatci o obrtu su obrisani.", "success");
   };
 
   const getStorageInfo = () => {
@@ -555,11 +504,6 @@ export default function SettingsComponent() {
 
   return (
     <div className="space-y-6">
-      {message && (
-        <Alert variant={message.type === "success" ? "default" : "destructive"}>
-          <AlertDescription>{message.text}</AlertDescription>
-        </Alert>
-      )}
 
       <Tabs defaultValue="company" className="w-full">
         <TabsList className="grid w-full grid-cols-4">

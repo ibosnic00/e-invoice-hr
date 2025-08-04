@@ -84,17 +84,27 @@ export default function RecentItems({ type, onLoadData, onScrollToTop }: RecentI
       // Handle new items structure or fallback to old structure
       let total = 0
       let description = ""
+      let itemCount = 0
       
       if (data.items && data.items.length > 0) {
         total = data.items.reduce((sum: number, item: any) => sum + (item.cijenaPoJedinici * item.kolicina), 0)
         description = data.items[0].nazivRobeUsluge
+        itemCount = data.items.length
       } else {
         // Fallback for old structure
         total = data.kolicina * data.cijenaPoJedinici
         description = data.nazivRobeUsluge
+        itemCount = 1
       }
       
-      return `${(total / 100).toFixed(2).replace('.', ',')} EUR - ${description}`
+      const baseDescription = `${(total / 100).toFixed(2).replace('.', ',')} EUR - ${description}`
+      
+      // Add item count if there are multiple items
+      if (itemCount > 1) {
+        return `${baseDescription} (Broj stavki na računu: ${itemCount})`
+      }
+      
+      return baseDescription
     }
   }
 

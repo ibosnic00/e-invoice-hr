@@ -16,8 +16,10 @@ import { formatAmountForDisplay, parseAmountFromDisplay } from "@/utils/barcodeP
 import { saveCustomer } from "@/utils/customerStorage"
 import CustomerInputWithSelector from "./customer-input-with-selector"
 import RecentItems from "./recent-items"
+import { useToast } from "@/components/ui/toast"
 
 const BarcodeGenerator = forwardRef<any, {}>((props, ref) => {
+  const { showToast } = useToast()
   const barcodeRef = useRef<HTMLCanvasElement>(null)
 
   // Helper function to safely get localStorage value
@@ -669,6 +671,7 @@ const BarcodeGenerator = forwardRef<any, {}>((props, ref) => {
             setAmountDisplay(formatAmountForDisplay(data.Iznos))
           }
           setIsDataLoadedFromHistory(true)
+          showToast("Prethodno generirani barkod je uspješno učitan.", "success")
         }}
         onScrollToTop={() => {
           // Scroll to top of the page

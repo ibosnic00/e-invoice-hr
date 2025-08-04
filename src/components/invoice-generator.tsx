@@ -57,12 +57,15 @@ import CustomerInputWithSelector from "./customer-input-with-selector"
 // Import the actual PDF generation utility
 import { generatePDF } from "../utils/pdfGeneration"
 import RecentItems from "./recent-items"
+import { useToast } from "@/components/ui/toast"
 
 export interface InvoiceGeneratorRef {
   loadData: (data: InvoiceData) => void
 }
 
 const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
+  const { showToast } = useToast()
+  
   // Helper function to safely get localStorage value
   const getLocalStorageValue = (key: string, defaultValue = "") => {
     if (typeof window !== "undefined" && window.localStorage) {
@@ -917,7 +920,6 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
               />
             </div>
           </div>
-          <p className="text-sm text-gray-500 mt-1">Koristit će se broj računa kao poziv na broj</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -1007,6 +1009,7 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
             setPriceDisplay(formatAmountForDisplay(data.cijenaPoJedinici))
           }
           setIsDataLoadedFromHistory(true)
+          showToast("Prethodno generirani račun je uspješno učitan.", "success")
         }}
         onScrollToTop={() => {
           // Scroll to top of the page
