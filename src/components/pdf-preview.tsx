@@ -14,6 +14,7 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({ invoiceData }) => {
   const invoiceIssuer = localStorage.getItem('invoiceIssuer') || invoiceData.imeFirme || "Moja tvrtka";
   const companyLogo = localStorage.getItem('companyLogo');
   const companyPhone = localStorage.getItem('companyPhone') || invoiceData.brojMobitelaVlasnika || "";
+  const vatNote = localStorage.getItem('vatNote') || 'PDV nije obračunat sukladno članku 90. stavku 1. i stavku 2. Zakona o PDV-u - mali porezni obveznik.';
 
   // Calculate total amount
   const totalAmount = invoiceData.kolicina * (invoiceData.cijenaPoJedinici / 100);
@@ -169,7 +170,7 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({ invoiceData }) => {
         marginBottom: '20px',
         fontStyle: 'italic'
       }}>
-        *PDV nije obračunat sukladno članku 90. stavku 1. i stavku 2. Zakona o PDV-u - mali porezni obveznik.
+        *{vatNote}
       </div>
 
       {/* Payment Information */}

@@ -29,6 +29,7 @@ export default function SettingsComponent() {
   const [companyAccountNumber, setCompanyAccountNumber] = useState(localStorage.getItem('companyAccountNumber') || '')
   const [companyOIB, setCompanyOIB] = useState(localStorage.getItem('companyOIB') || '')
   const [companyPhone, setCompanyPhone] = useState(localStorage.getItem('companyPhone') || '')
+  const [vatNote, setVatNote] = useState(localStorage.getItem('vatNote') || 'PDV nije obračunat sukladno članku 90. stavku 1. i stavku 2. Zakona o PDV-u - mali porezni obveznik.')
   const [customers, setCustomers] = useState<Customer[]>([])
   const [isInvoiceSettingsExpanded, setIsInvoiceSettingsExpanded] = useState(false)
   const [isOtherSettingsExpanded, setIsOtherSettingsExpanded] = useState(false)
@@ -69,6 +70,7 @@ export default function SettingsComponent() {
         companyAccountNumber: localStorage.getItem('companyAccountNumber'),
         companyOIB: localStorage.getItem('companyOIB'),
         companyPhone: localStorage.getItem('companyPhone'),
+        vatNote: localStorage.getItem('vatNote'),
         customers: localStorage.getItem('savedCustomers'),
         timestamp: new Date().toISOString()
       }
@@ -113,6 +115,7 @@ export default function SettingsComponent() {
         if (importedData.companyAccountNumber) localStorage.setItem('companyAccountNumber', importedData.companyAccountNumber)
         if (importedData.companyOIB) localStorage.setItem('companyOIB', importedData.companyOIB)
         if (importedData.companyPhone) localStorage.setItem('companyPhone', importedData.companyPhone)
+        if (importedData.vatNote) localStorage.setItem('vatNote', importedData.vatNote)
         if (importedData.customers) localStorage.setItem('savedCustomers', importedData.customers)
 
         setMessage({ type: 'success', text: 'Podatci su uspješno uvezeni.' })
@@ -153,6 +156,9 @@ export default function SettingsComponent() {
          }
                    if (importedData.companyPhone) {
             setCompanyPhone(importedData.companyPhone)
+          }
+          if (importedData.vatNote) {
+            setVatNote(importedData.vatNote)
           }
           if (importedData.customers) {
             setCustomers(getCustomers())
@@ -269,6 +275,12 @@ export default function SettingsComponent() {
        setMessage({ type: 'success', text: 'Broj telefona obrta je uspješno spremljen.' })
      }
 
+     const handleVatNoteChange = (value: string) => {
+       setVatNote(value)
+       localStorage.setItem('vatNote', value)
+       setMessage({ type: 'success', text: 'Napomena je uspješno spremljena.' })
+     }
+
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
@@ -323,6 +335,7 @@ export default function SettingsComponent() {
          setCompanyAccountNumber('')
      setCompanyOIB('')
            setCompanyPhone('')
+      setVatNote('PDV nije obračunat sukladno članku 90. stavku 1. i stavku 2. Zakona o PDV-u - mali porezni obveznik.')
       setCustomers([])
       localStorage.removeItem('companyName')
       localStorage.removeItem('companyFullName')
@@ -336,6 +349,7 @@ export default function SettingsComponent() {
       localStorage.removeItem('companyAccountNumber')
       localStorage.removeItem('companyOIB')
       localStorage.removeItem('companyPhone')
+      localStorage.removeItem('vatNote')
       localStorage.removeItem('savedCustomers')
     
     // Update invoice generator data if it exists
@@ -478,6 +492,20 @@ export default function SettingsComponent() {
                        />
                        <p className="text-sm text-gray-500">
                          Broj telefona koji će se prikazati u PDF računima
+                       </p>
+                     </div>
+
+                     <div className="space-y-2">
+                       <Label htmlFor="vat-note">Napomena</Label>
+                       <Textarea
+                         id="vat-note"
+                         value={vatNote}
+                         onChange={(e) => handleVatNoteChange(e.target.value)}
+                         placeholder="Unesite napomenu koja će se prikazati u PDF računima"
+                         rows={3}
+                       />
+                       <p className="text-sm text-gray-500">
+                         Napomena koja će se prikazati u PDF računima ispod popisa stavki
                        </p>
                      </div>
 
