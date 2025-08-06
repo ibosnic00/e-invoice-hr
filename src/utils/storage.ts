@@ -115,15 +115,35 @@ export function generateAutomaticInvoiceNumber(): string {
   return `${formattedNumber}-${settings.oznakaPoslovnogProstora}-${settings.oznakaNaplatnogUredaja}`
 }
 
-export function incrementInvoiceNumber(): void {
+export function incrementInvoiceNumber(currentInvoiceNumber?: string): void {
   const settings = getInvoiceNumberSettings()
   if (!settings.useAutomaticNumbering) return
 
-  const nextNumber = parseInt(settings.redniBrojZadnjegRacuna) + 1
-  const newSettings = {
-    ...settings,
-    redniBrojZadnjegRacuna: nextNumber.toString().padStart(2, '0')
+  // If no current invoice number provided, just increment normally
+  if (!currentInvoiceNumber) {
+    const nextNumber = parseInt(settings.redniBrojZadnjegRacuna) + 1
+    const newSettings = {
+      ...settings,
+      redniBrojZadnjegRacuna: nextNumber.toString().padStart(2, '0')
+    }
+    saveInvoiceNumberSettings(newSettings)
+    return
   }
-  
-  saveInvoiceNumberSettings(newSettings)
+
+  // Extract the sequential number from the current invoice number
+  // Format: XX-YY-ZZ where XX is the sequential number
+  const parts = currentInvoiceNumber.split('-')
+  if (parts.length !== 3) return
+
+  const currentSequentialNumber = parseInt(parts[0])
+  const storedSequentialNumber = parseInt(settings.redniBrojZadnjegRacuna)
+
+  // Only increment if the current invoice number is higher than the stored one
+  if (currentSequentialNumber > storedSequentialNumber) {
+    const newSettings = {
+      ...settings,
+      redniBrojZadnjegRacuna: currentSequentialNumber.toString().padStart(2, '0')
+    }
+    saveInvoiceNumberSettings(newSettings)
+  }
 } 

@@ -557,7 +557,7 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
       // Increment invoice number if automatic numbering is enabled
       const settings = getInvoiceNumberSettings()
       if (settings.useAutomaticNumbering) {
-        incrementInvoiceNumber()
+        incrementInvoiceNumber(formData.brojRacuna)
       }
       
       // Save to history

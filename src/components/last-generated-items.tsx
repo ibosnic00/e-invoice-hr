@@ -66,7 +66,14 @@ export default function LastGeneratedItems({
       return data.Primatelj || "Barkod za plaćanje"
     } else {
       const data = item.data as any
-      return data.imeFirme || "PDF račun"
+      const companyName = data.imeFirme || "PDF račun"
+      const customerName = data.imeKupca || ""
+      
+      if (customerName) {
+        return `${companyName} -> ${customerName}`
+      } else {
+        return companyName
+      }
     }
   }
 

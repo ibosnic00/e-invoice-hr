@@ -83,7 +83,7 @@ export default function CustomerInputWithSelector({
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Odaberi kupca</DialogTitle>
+                <DialogTitle className="text-gray-700 dark:text-gray-200">Odaberi kupca</DialogTitle>
               </DialogHeader>
               {customers.length === 0 ? (
                 <div className="text-center py-8">
