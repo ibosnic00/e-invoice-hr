@@ -198,15 +198,26 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
         }
       } else {
         // Generate default invoice number for new forms
-        const currentDate = new Date()
-        const year = currentDate.getFullYear().toString().slice(-2)
-        const month = (currentDate.getMonth() + 1).toString().padStart(2, "0")
-        const invoiceNumber = `1-${month}-${year}`
+        const settings = getInvoiceNumberSettings()
+        if (settings.useAutomaticNumbering) {
+          // Use automatic numbering format
+          const automaticNumber = generateAutomaticInvoiceNumber()
+          setFormData((prev) => ({
+            ...prev,
+            brojRacuna: automaticNumber,
+          }))
+        } else {
+          // Use fallback format when automatic numbering is disabled
+          const currentDate = new Date()
+          const year = currentDate.getFullYear().toString().slice(-2)
+          const month = (currentDate.getMonth() + 1).toString().padStart(2, "0")
+          const invoiceNumber = `1-${month}-${year}`
 
-        setFormData((prev) => ({
-          ...prev,
-          brojRacuna: invoiceNumber,
-        }))
+          setFormData((prev) => ({
+            ...prev,
+            brojRacuna: invoiceNumber,
+          }))
+        }
       }
     }
   }, [isDataLoadedFromHistory])
