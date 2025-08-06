@@ -680,6 +680,7 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
     })
 
     setPriceDisplay("")
+    setItemPriceDisplays({})
     setErrors([])
     setShowPdfPreview(false)
     setIsDataLoadedFromHistory(false)
