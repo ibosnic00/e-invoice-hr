@@ -112,6 +112,7 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
   const [isCustomerInfoExpanded, setIsCustomerInfoExpanded] = useState(false)
   const [isDataLoadedFromHistory, setIsDataLoadedFromHistory] = useState(false)
   const [itemPriceDisplays, setItemPriceDisplays] = useState<{ [key: string]: string }>({})
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
 
   // Expose loadData method to parent component
   useImperativeHandle(ref, () => ({
@@ -513,6 +514,7 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
 
   const handleSavePdf = async () => {
     try {
+      setIsGeneratingPdf(true)
       await generatePDF(formData)
       
       // Increment invoice number if automatic numbering is enabled
@@ -545,6 +547,8 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
     } catch (error) {
       console.error("Error generating PDF:", error)
       setErrors(["Došlo je do greške tijekom generiranja PDF-a"])
+    } finally {
+      setIsGeneratingPdf(false)
     }
   }
 
@@ -1013,18 +1017,38 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
           <DialogHeader>
             <DialogTitle>Pregled računa</DialogTitle>
           </DialogHeader>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 relative">
             <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 overflow-auto flex-1" style={{ maxHeight: "60vh" }}>
               <div className="pdf-preview" style={{ transform: "scale(1)", transformOrigin: "top left", margin: "0 auto", display: "block" }}>
                 <PDFPreview invoiceData={formData} />
               </div>
             </div>
             <div className="flex justify-end gap-2">
-              <Button onClick={() => setShowPdfPreview(false)} variant="outline">
+              <Button onClick={() => setShowPdfPreview(false)} variant="outline" disabled={isGeneratingPdf}>
                 Odustani
               </Button>
-              <Button onClick={handleSavePdf}>Spremi kao PDF</Button>
+              <Button onClick={handleSavePdf} disabled={isGeneratingPdf}>
+                {isGeneratingPdf ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Generiranje PDF-a...
+                  </div>
+                ) : (
+                  "Spremi kao PDF"
+                )}
+              </Button>
             </div>
+            
+            {/* Loading Overlay */}
+            {isGeneratingPdf && (
+              <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-10">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                  <p className="text-lg font-medium text-gray-700 dark:text-gray-300">Generiranje PDF-a...</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Molimo pričekajte</p>
+                </div>
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
