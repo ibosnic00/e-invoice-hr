@@ -454,6 +454,7 @@ const BarcodeGenerator = forwardRef<any, {}>((props, ref) => {
                     value={formData.PozivNaBroj.toString()}
                     onChange={(e) => handlePozivNaBrojChange(e.target.value)}
                     placeholder="123456789"
+                    autoComplete="off"
                   />
                 </div>
               </div>

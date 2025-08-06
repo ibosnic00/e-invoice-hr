@@ -31,6 +31,12 @@ import {
   type Customer,
 } from "@/utils/customerStorage";
 import { ThemeToggle } from "./theme-toggle";
+import { Switch } from "./ui/switch";
+import {
+  getInvoiceNumberSettings,
+  saveInvoiceNumberSettings,
+  type InvoiceNumberSettings,
+} from "@/utils/storage";
 
 export default function SettingsComponent() {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -85,8 +91,19 @@ export default function SettingsComponent() {
   const [showConfirmDeleteCompany, setShowConfirmDeleteCompany] =
     useState(false);
 
+  // Invoice number settings state
+  const [invoiceNumberSettings, setInvoiceNumberSettings] =
+    useState<InvoiceNumberSettings>({
+      useAutomaticNumbering: false,
+      redniBrojZadnjegRacuna: "00",
+      oznakaPoslovnogProstora: "01",
+      oznakaNaplatnogUredaja: new Date().getFullYear().toString().slice(-2),
+    });
+
   useEffect(() => {
     setCustomers(getCustomers());
+    // Load invoice number settings
+    setInvoiceNumberSettings(getInvoiceNumberSettings());
   }, []);
 
   const handleClearAllData = () => {
@@ -122,6 +139,7 @@ export default function SettingsComponent() {
         vatNote: localStorage.getItem("vatNote"),
         mbo: localStorage.getItem("mbo"),
         customers: localStorage.getItem("savedCustomers"),
+        invoiceNumberSettings: localStorage.getItem("invoice-number-settings"),
         timestamp: new Date().toISOString(),
       };
 
@@ -205,6 +223,11 @@ export default function SettingsComponent() {
         if (importedData.mbo) localStorage.setItem("mbo", importedData.mbo);
         if (importedData.customers)
           localStorage.setItem("savedCustomers", importedData.customers);
+        if (importedData.invoiceNumberSettings)
+          localStorage.setItem(
+            "invoice-number-settings",
+            importedData.invoiceNumberSettings
+          );
 
         showToast("Podatci su uspješno uvezeni.", "success");
 
@@ -253,6 +276,9 @@ export default function SettingsComponent() {
         }
         if (importedData.customers) {
           setCustomers(getCustomers());
+        }
+        if (importedData.invoiceNumberSettings) {
+          setInvoiceNumberSettings(getInvoiceNumberSettings());
         }
       } catch (error) {
         showToast(
@@ -387,6 +413,52 @@ export default function SettingsComponent() {
     showToast("MBO je uspješno spremljen.", "success");
   };
 
+  // Invoice number settings handlers
+  const handleAutomaticNumberingToggle = (enabled: boolean) => {
+    const newSettings = {
+      ...invoiceNumberSettings,
+      useAutomaticNumbering: enabled,
+    };
+    setInvoiceNumberSettings(newSettings);
+    saveInvoiceNumberSettings(newSettings);
+    showToast(
+      enabled
+        ? "Automatsko numeriranje računa je uključeno."
+        : "Automatsko numeriranje računa je isključeno.",
+      "success"
+    );
+  };
+
+  const handleRedniBrojChange = (value: string) => {
+    const newSettings = {
+      ...invoiceNumberSettings,
+      redniBrojZadnjegRacuna: value,
+    };
+    setInvoiceNumberSettings(newSettings);
+    saveInvoiceNumberSettings(newSettings);
+    showToast("Redni broj zadnjeg računa je uspješno spremljen.", "success");
+  };
+
+  const handleOznakaPoslovnogProstoraChange = (value: string) => {
+    const newSettings = {
+      ...invoiceNumberSettings,
+      oznakaPoslovnogProstora: value,
+    };
+    setInvoiceNumberSettings(newSettings);
+    saveInvoiceNumberSettings(newSettings);
+    showToast("Oznaka poslovnog prostora je uspješno spremljena.", "success");
+  };
+
+  const handleOznakaNaplatnogUredajaChange = (value: string) => {
+    const newSettings = {
+      ...invoiceNumberSettings,
+      oznakaNaplatnogUredaja: value,
+    };
+    setInvoiceNumberSettings(newSettings);
+    saveInvoiceNumberSettings(newSettings);
+    showToast("Oznaka naplatnog uređaja je uspješno spremljena.", "success");
+  };
+
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -446,6 +518,12 @@ export default function SettingsComponent() {
     );
     setMbo("");
     setCustomers([]);
+    setInvoiceNumberSettings({
+      useAutomaticNumbering: false,
+      redniBrojZadnjegRacuna: "00",
+      oznakaPoslovnogProstora: "01",
+      oznakaNaplatnogUredaja: new Date().getFullYear().toString().slice(-2),
+    });
     localStorage.removeItem("companyName");
     localStorage.removeItem("companyFullName");
     localStorage.removeItem("invoiceIssuer");
@@ -461,6 +539,7 @@ export default function SettingsComponent() {
     localStorage.removeItem("vatNote");
     localStorage.removeItem("mbo");
     localStorage.removeItem("savedCustomers");
+    localStorage.removeItem("invoice-number-settings");
 
     // Update invoice generator data if it exists
     const invoiceData = localStorage.getItem("invoiceGeneratorData");
@@ -673,6 +752,111 @@ export default function SettingsComponent() {
                 {isInvoiceSettingsExpanded && (
                   <div className="space-y-4">
                     <div className="space-y-2">
+                      {/* Automatic Invoice Number Settings */}
+                      <div className="space-y-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <Label htmlFor="automatic-numbering">
+                              Automatsko numeriranje računa
+                            </Label>
+                            <Switch
+                              id="automatic-numbering"
+                              checked={
+                                invoiceNumberSettings.useAutomaticNumbering
+                              }
+                              onCheckedChange={handleAutomaticNumberingToggle}
+                            />
+                          </div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            Omogućava automatsko generiranje broja računa u
+                            formatu: redni broj - oznaka poslovnog prostora -
+                            oznaka naplatnog uređaja
+                          </p>
+                        </div>
+
+                        {invoiceNumberSettings.useAutomaticNumbering && (
+                          <div className="space-y-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <div className="space-y-2">
+                              <Label htmlFor="redni-broj">
+                                Redni broj zadnjeg računa
+                              </Label>
+                              <Input
+                                id="redni-broj"
+                                value={
+                                  invoiceNumberSettings.redniBrojZadnjegRacuna
+                                }
+                                onChange={(e) =>
+                                  handleRedniBrojChange(e.target.value)
+                                }
+                                placeholder="00"
+                              />
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                Broj koji će se koristiti kao osnova za sljedeći
+                                račun (automatski se povećava)
+                              </p>
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label htmlFor="oznaka-poslovnog-prostora">
+                                Oznaka poslovnog prostora
+                              </Label>
+                              <Input
+                                id="oznaka-poslovnog-prostora"
+                                value={
+                                  invoiceNumberSettings.oznakaPoslovnogProstora
+                                }
+                                onChange={(e) =>
+                                  handleOznakaPoslovnogProstoraChange(
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="01"
+                              />
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                Oznaka poslovnog prostora (obično 01 ukoliko nemate više poslovnih prostora)
+                              </p>
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label htmlFor="oznaka-naplatnog-uredaja">
+                                Oznaka naplatnog uređaja
+                              </Label>
+                              <Input
+                                id="oznaka-naplatnog-uredaja"
+                                value={
+                                  invoiceNumberSettings.oznakaNaplatnogUredaja
+                                }
+                                onChange={(e) =>
+                                  handleOznakaNaplatnogUredajaChange(
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="25"
+                              />
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                Oznaka naplatnog uređaja (obično zadnje dvije
+                                znamenke godine ukoliko nemate naplatni uređaj)
+                              </p>
+                            </div>
+
+                            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                              <p className="text-sm text-blue-700 dark:text-blue-300">
+                                <strong>Sljedeći broj računa:</strong>{" "}
+                                {(
+                                  parseInt(
+                                    invoiceNumberSettings.redniBrojZadnjegRacuna
+                                  ) + 1
+                                )
+                                  .toString()
+                                  .padStart(2, "0")}
+                                -{invoiceNumberSettings.oznakaPoslovnogProstora}
+                                -{invoiceNumberSettings.oznakaNaplatnogUredaja}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
                       <Label>Logo obrta</Label>
                       {companyLogo ? (
                         <div className="space-y-2">
@@ -692,9 +876,9 @@ export default function SettingsComponent() {
                               Ukloni logo
                             </Button>
                           </div>
-                                                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                          Logo je učitan i bit će prikazan u PDF računima
-                        </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            Logo je učitan i bit će prikazan u PDF računima
+                          </p>
                         </div>
                       ) : (
                         <div className="space-y-2">
@@ -858,11 +1042,15 @@ export default function SettingsComponent() {
                         className="text-sm p-2 bg-gray-50 dark:bg-gray-800 rounded"
                       >
                         <div className="font-medium">{customer.name}</div>
-                        <div className="text-gray-600 dark:text-gray-300">{customer.address}</div>
+                        <div className="text-gray-600 dark:text-gray-300">
+                          {customer.address}
+                        </div>
                         <div className="text-gray-600 dark:text-gray-300">
                           {customer.postalCode} {customer.city}
                         </div>
-                        <div className="text-gray-500 dark:text-gray-400">OIB: {customer.oib}</div>
+                        <div className="text-gray-500 dark:text-gray-400">
+                          OIB: {customer.oib}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -939,7 +1127,9 @@ export default function SettingsComponent() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>Verzija aplikacije</Label>
-                <p className="text-sm text-gray-600 dark:text-gray-300">1.0.0</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  1.0.0
+                </p>
               </div>
 
               <div className="space-y-2">

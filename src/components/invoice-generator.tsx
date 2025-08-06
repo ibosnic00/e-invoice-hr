@@ -58,6 +58,11 @@ import CustomerInputWithSelector from "./customer-input-with-selector"
 import { generatePDF } from "../utils/pdfGeneration"
 import RecentItems from "./recent-items"
 import { useToast } from "@/components/ui/toast"
+import { 
+  getInvoiceNumberSettings, 
+  generateAutomaticInvoiceNumber, 
+  incrementInvoiceNumber 
+} from "@/utils/storage"
 
 export interface InvoiceGeneratorRef {
   loadData: (data: InvoiceData) => void
@@ -95,7 +100,7 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
       cijenaPoJedinici: 0
     }],
     brojRacunaObrta: "",
-    brojRacuna: "",
+    brojRacuna: generateAutomaticInvoiceNumber(),
     pozivNaBroj: "",
     model: "00",
   })
@@ -469,15 +474,24 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
 
       // Generate invoice number if not set
       if (!formData.brojRacuna) {
-        const currentDate = new Date()
-        const year = currentDate.getFullYear().toString().slice(-2)
-        const month = (currentDate.getMonth() + 1).toString().padStart(2, "0")
-        const invoiceNumber = `1-${month}-${year}`
+        const settings = getInvoiceNumberSettings()
+        if (settings.useAutomaticNumbering) {
+          const automaticNumber = generateAutomaticInvoiceNumber()
+          setFormData((prev) => ({
+            ...prev,
+            brojRacuna: automaticNumber,
+          }))
+        } else {
+          const currentDate = new Date()
+          const year = currentDate.getFullYear().toString().slice(-2)
+          const month = (currentDate.getMonth() + 1).toString().padStart(2, "0")
+          const invoiceNumber = `1-${month}-${year}`
 
-        setFormData((prev) => ({
-          ...prev,
-          brojRacuna: invoiceNumber,
-        }))
+          setFormData((prev) => ({
+            ...prev,
+            brojRacuna: invoiceNumber,
+          }))
+        }
       }
 
       // Set poziv na broj to broj računa if not already set
@@ -500,6 +514,13 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
   const handleSavePdf = async () => {
     try {
       await generatePDF(formData)
+      
+      // Increment invoice number if automatic numbering is enabled
+      const settings = getInvoiceNumberSettings()
+      if (settings.useAutomaticNumbering) {
+        incrementInvoiceNumber()
+      }
+      
       // Save to history
       const historyItem = {
         type: "invoice" as const,
@@ -591,7 +612,7 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
           cijenaPoJedinici: 0
         }],
       brojRacunaObrta: companyAccountNumber,
-      brojRacuna: "",
+      brojRacuna: generateAutomaticInvoiceNumber(),
       pozivNaBroj: "",
       model: "00",
     })
@@ -761,6 +782,7 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
                 value={formData.brojRacuna}
                 onChange={(e) => handleBrojRacunaChange(e.target.value)}
                 placeholder="1-1-25"
+                className={getInvoiceNumberSettings().useAutomaticNumbering ? "bg-blue-50 dark:bg-blue-900/20" : ""}
               />
               <div className="relative group">
                 <button
@@ -785,6 +807,11 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
                 </div>
               </div>
             </div>
+            {getInvoiceNumberSettings().useAutomaticNumbering && (
+              <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">
+                🔄 Automatsko numeriranje je uključeno - broj se automatski generira i povećava
+              </p>
+            )}
           </div>
 
           
@@ -917,6 +944,7 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
                 value={formData.pozivNaBroj}
                 onChange={(e) => handlePozivNaBrojChange(e.target.value)}
                 placeholder="Automatski će se koristiti broj računa osim ako unesete ručno"
+                autoComplete="off"
               />
             </div>
           </div>
