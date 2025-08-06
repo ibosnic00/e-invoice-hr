@@ -79,6 +79,13 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
     return defaultValue
   }
 
+  // Helper function to format date with mjesto prefix
+  const formatDateWithMjesto = (date: Date) => {
+    const mjesto = getLocalStorageValue("mjesto", "")
+    const formattedDate = date.toLocaleDateString("hr-HR")
+    return mjesto ? `${mjesto}, ${formattedDate}` : formattedDate
+  }
+
   const [formData, setFormData] = useState<InvoiceData>({
     imeFirme: getLocalStorageValue("companyName"),
     adresaVlasnika: "",
@@ -89,9 +96,9 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
     adresaKupca: "",
     postanskiBrojIGradKupca: "",
     oibKupca: "",
-    mjestoIDatumIzdavanja: new Date().toLocaleDateString("hr-HR"),
+    mjestoIDatumIzdavanja: formatDateWithMjesto(new Date()),
     vrijemeIzdavanja: new Date().toLocaleTimeString("hr-HR"),
-    mjestoIDatumIsporuke: new Date().toLocaleDateString("hr-HR"),
+    mjestoIDatumIsporuke: formatDateWithMjesto(new Date()),
     datumPlacanja: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString("hr-HR"),
     items: [{
       id: "1",
@@ -268,6 +275,17 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
     }
   }, [isDataLoadedFromHistory])
 
+  // Ensure poziv na broj is populated when broj računa exists
+  useEffect(() => {
+    if (formData.brojRacuna && !formData.pozivNaBroj) {
+      const numericOnly = formData.brojRacuna.replace(/[^0-9]/g, "")
+      setFormData((prev) => ({
+        ...prev,
+        pozivNaBroj: numericOnly,
+      }))
+    }
+  }, [formData.brojRacuna, formData.pozivNaBroj])
+
   // Listen for address changes in settings
   useEffect(() => {
     if (typeof window !== "undefined" && !isDataLoadedFromHistory) {
@@ -304,6 +322,25 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
 
       window.addEventListener("storage", handleAddressStorageChange)
       return () => window.removeEventListener("storage", handleAddressStorageChange)
+    }
+  }, [isDataLoadedFromHistory])
+
+  // Listen for mjesto changes in settings
+  useEffect(() => {
+    if (typeof window !== "undefined" && !isDataLoadedFromHistory) {
+      const handleMjestoStorageChange = () => {
+        const mjesto = localStorage.getItem("mjesto") || ""
+        
+        // Update date fields with new mjesto prefix
+        setFormData((prev) => ({
+          ...prev,
+          mjestoIDatumIzdavanja: mjesto ? `${mjesto}, ${new Date().toLocaleDateString("hr-HR")}` : new Date().toLocaleDateString("hr-HR"),
+          mjestoIDatumIsporuke: mjesto ? `${mjesto}, ${new Date().toLocaleDateString("hr-HR")}` : new Date().toLocaleDateString("hr-HR"),
+        }))
+      }
+
+      window.addEventListener("storage", handleMjestoStorageChange)
+      return () => window.removeEventListener("storage", handleMjestoStorageChange)
     }
   }, [isDataLoadedFromHistory])
 
@@ -544,6 +581,10 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
       }
 
       setShowPdfPreview(false)
+      
+      // Reset form after successful PDF generation
+      handleResetForm()
+      
     } catch (error) {
       console.error("Error generating PDF:", error)
       setErrors(["Došlo je do greške tijekom generiranja PDF-a"])
@@ -574,7 +615,7 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
     }
   }
 
-  const handleResetForm = () => {
+    const handleResetForm = () => {
     // Get company data from settings to preserve auto-filled fields
     const companyName = getLocalStorageValue("companyName")
     const companyStreet = getLocalStorageValue("companyStreet")
@@ -595,6 +636,12 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
     const fullPostalCode =
       companyPostalCode && companyCity ? `${companyPostalCode} ${companyCity}`.trim() : companyPostalCode || companyCity
 
+    // Generate new invoice number
+    const newInvoiceNumber = generateAutomaticInvoiceNumber()
+    
+    // Generate poziv na broj based on invoice number (numeric only)
+    const pozivNaBroj = newInvoiceNumber.replace(/[^0-9]/g, "")
+
     setFormData({
       imeFirme: companyName,
       adresaVlasnika: fullAddress,
@@ -605,19 +652,19 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
       adresaKupca: "",
       postanskiBrojIGradKupca: "",
       oibKupca: "",
-      mjestoIDatumIzdavanja: new Date().toLocaleDateString("hr-HR"),
+      mjestoIDatumIzdavanja: formatDateWithMjesto(new Date()),
       vrijemeIzdavanja: new Date().toLocaleTimeString("hr-HR"),
-      mjestoIDatumIsporuke: new Date().toLocaleDateString("hr-HR"),
+      mjestoIDatumIsporuke: formatDateWithMjesto(new Date()),
       datumPlacanja: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString("hr-HR"),
-              items: [{
-          id: "1",
-          nazivRobeUsluge: "",
-          kolicina: 1,
-          cijenaPoJedinici: 0
-        }],
+      items: [{
+        id: "1",
+        nazivRobeUsluge: "",
+        kolicina: 1,
+        cijenaPoJedinici: 0
+      }],
       brojRacunaObrta: companyAccountNumber,
-      brojRacuna: generateAutomaticInvoiceNumber(),
-      pozivNaBroj: "",
+      brojRacuna: newInvoiceNumber,
+      pozivNaBroj: pozivNaBroj,
       model: "00",
     })
 

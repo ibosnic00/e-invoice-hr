@@ -50,6 +50,9 @@ export default function SettingsComponent() {
   const [invoiceIssuer, setInvoiceIssuer] = useState(
     localStorage.getItem("invoiceIssuer") || ""
   );
+  const [mjesto, setMjesto] = useState(
+    localStorage.getItem("mjesto") || ""
+  );
   const [companyLogo, setCompanyLogo] = useState<string>(
     localStorage.getItem("companyLogo") || ""
   );
@@ -127,6 +130,7 @@ export default function SettingsComponent() {
         companyName: localStorage.getItem("companyName"),
         companyFullName: localStorage.getItem("companyFullName"),
         invoiceIssuer: localStorage.getItem("invoiceIssuer"),
+        mjesto: localStorage.getItem("mjesto"),
         companyLogo: localStorage.getItem("companyLogo"),
         bankName: localStorage.getItem("bankName"),
         companyStreet: localStorage.getItem("companyStreet"),
@@ -191,6 +195,8 @@ export default function SettingsComponent() {
           localStorage.setItem("companyFullName", importedData.companyFullName);
         if (importedData.invoiceIssuer)
           localStorage.setItem("invoiceIssuer", importedData.invoiceIssuer);
+        if (importedData.mjesto)
+          localStorage.setItem("mjesto", importedData.mjesto);
         if (importedData.companyLogo)
           localStorage.setItem("companyLogo", importedData.companyLogo);
         if (importedData.bankName)
@@ -243,6 +249,9 @@ export default function SettingsComponent() {
         }
         if (importedData.invoiceIssuer) {
           setInvoiceIssuer(importedData.invoiceIssuer);
+        }
+        if (importedData.mjesto) {
+          setMjesto(importedData.mjesto);
         }
         if (importedData.bankName) {
           setBankName(importedData.bankName);
@@ -343,6 +352,12 @@ export default function SettingsComponent() {
     setInvoiceIssuer(value);
     localStorage.setItem("invoiceIssuer", value);
     showToast("Račun izradio je uspješno spremljen.", "success");
+  };
+
+  const handleMjestoChange = (value: string) => {
+    setMjesto(value);
+    localStorage.setItem("mjesto", value);
+    showToast("Mjesto je uspješno spremljeno.", "success");
   };
 
   const handleCompanyStreetChange = (value: string) => {
@@ -504,6 +519,7 @@ export default function SettingsComponent() {
     setCompanyName("");
     setCompanyFullName("");
     setInvoiceIssuer("");
+    setMjesto("");
     setCompanyLogo("");
     setBankName("");
     setCompanyStreet("");
@@ -527,6 +543,7 @@ export default function SettingsComponent() {
     localStorage.removeItem("companyName");
     localStorage.removeItem("companyFullName");
     localStorage.removeItem("invoiceIssuer");
+    localStorage.removeItem("mjesto");
     localStorage.removeItem("companyLogo");
     localStorage.removeItem("bankName");
     localStorage.removeItem("companyStreet");
@@ -929,6 +946,21 @@ export default function SettingsComponent() {
                       />
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         Ime osobe koja je izdala račun
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="mjesto">Mjesto</Label>
+                      <Input
+                        id="mjesto"
+                        value={mjesto}
+                        onChange={(e) =>
+                          handleMjestoChange(e.target.value)
+                        }
+                        placeholder="npr. Split"
+                      />
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Mjesto u kojem je račun izrađen
                       </p>
                     </div>
 

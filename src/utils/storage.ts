@@ -66,7 +66,7 @@ export function getInvoiceNumberSettings(): InvoiceNumberSettings {
   if (typeof window === "undefined") {
     return {
       useAutomaticNumbering: false,
-      redniBrojZadnjegRacuna: "01",
+      redniBrojZadnjegRacuna: "00",
       oznakaPoslovnogProstora: "01",
       oznakaNaplatnogUredaja: new Date().getFullYear().toString().slice(-2)
     }
@@ -78,7 +78,7 @@ export function getInvoiceNumberSettings(): InvoiceNumberSettings {
       const settings = JSON.parse(stored)
       return {
         useAutomaticNumbering: settings.useAutomaticNumbering || false,
-        redniBrojZadnjegRacuna: settings.redniBrojZadnjegRacuna || "01",
+        redniBrojZadnjegRacuna: settings.redniBrojZadnjegRacuna || "00",
         oznakaPoslovnogProstora: settings.oznakaPoslovnogProstora || "01",
         oznakaNaplatnogUredaja: settings.oznakaNaplatnogUredaja || new Date().getFullYear().toString().slice(-2)
       }
@@ -89,7 +89,7 @@ export function getInvoiceNumberSettings(): InvoiceNumberSettings {
 
   return {
     useAutomaticNumbering: false,
-    redniBrojZadnjegRacuna: "01",
+    redniBrojZadnjegRacuna: "00",
     oznakaPoslovnogProstora: "01",
     oznakaNaplatnogUredaja: new Date().getFullYear().toString().slice(-2)
   }
