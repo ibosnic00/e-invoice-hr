@@ -11,15 +11,29 @@ export const generatePDF = async (invoiceData: InvoiceData) => {
       throw new Error('PDF preview element not found');
     }
 
-    // Generiraj canvas iz HTML-a - koristi stvarne dimenzije elementa
+    // Spremi originalni transform
+    const originalTransform = pdfPreviewElement.style.transform;
+    const originalScale = pdfPreviewElement.style.transform.includes('scale') 
+      ? parseFloat(pdfPreviewElement.style.transform.match(/scale\(([^)]+)\)/)?.[1] || '1')
+      : 1;
+
+    // Privremeno povećaj scale za bolju kvalitetu PDF-a
+    const zoomFactor = 2; // 200% zoom
+    pdfPreviewElement.style.transform = `scale(${zoomFactor})`;
+    pdfPreviewElement.style.transformOrigin = 'top left';
+
+    // Pričekaj malo da se DOM ažurira
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // Generiraj canvas iz HTML-a s povećanim scale-om
     const canvas = await html2canvas(pdfPreviewElement, {
       useCORS: true,
       allowTaint: true,
       background: '#ffffff',
-      // Ukloni fiksne dimenzije - neka html2canvas koristi stvarne dimenzije elementa
-      // width: 794, // A4 širina u pikselima (210mm)
-      // height: 1123, // A4 visina u pikselima (297mm)
     });
+
+    // Vrati originalni transform
+    pdfPreviewElement.style.transform = originalTransform;
 
     // Kreiraj PDF s odgovarajućim dimenzijama
     const pdf = new jsPDF('p', 'mm', 'a4');

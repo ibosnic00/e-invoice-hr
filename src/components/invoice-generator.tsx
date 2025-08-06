@@ -1015,7 +1015,7 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
           </DialogHeader>
           <div className="flex flex-col gap-4">
             <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 overflow-auto flex-1" style={{ maxHeight: "60vh" }}>
-              <div className="pdf-preview">
+              <div className="pdf-preview" style={{ transform: "scale(1)", transformOrigin: "top left", margin: "0 auto", display: "block" }}>
                 <PDFPreview invoiceData={formData} />
               </div>
             </div>
