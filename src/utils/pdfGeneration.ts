@@ -32,8 +32,11 @@ export const generatePDF = async (invoiceData: InvoiceData) => {
     // Dodaj sliku u PDF s pravilnim dimenzijama
     pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
     
-    // Spremi PDF
-    pdf.save('racun.pdf');
+    // Spremi PDF s imenom baziranim na poziv na broj
+    const fileName = invoiceData.pozivNaBroj 
+      ? `Račun_${invoiceData.pozivNaBroj}.pdf`
+      : `Račun_${Date.now()}.pdf`;
+    pdf.save(fileName);
 
   } catch (error) {
     console.error('Error generating PDF:', error);

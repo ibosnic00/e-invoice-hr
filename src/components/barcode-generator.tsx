@@ -303,7 +303,10 @@ const BarcodeGenerator = forwardRef<any, {}>((props, ref) => {
   const handleDownloadBarcode = () => {
     if (barcodeRef.current) {
       const link = document.createElement("a")
-      link.download = `barcode-${Date.now()}.png`
+      const fileName = formData.PozivNaBroj 
+        ? `Barkod_${formData.PozivNaBroj}.png`
+        : `Barkod_${Date.now()}.png`;
+      link.download = fileName
       link.href = barcodeRef.current.toDataURL()
       link.click()
     }
