@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FileText, History, QrCode, Settings } from "lucide-react"
+import Image from "next/image"
 import BarcodeGenerator from "@/components/barcode-generator"
 import InvoiceGenerator from "@/components/invoice-generator"
 import LastGeneratedItems from "@/components/last-generated-items"
@@ -74,7 +75,37 @@ export default function HomePage() {
   }
 
   return (
-  <div className="min-h-screen bg-blue-50 dark:bg-gray-900 p-4">      
+  <div className="min-h-screen bg-blue-50 dark:bg-gray-900 p-4 relative">      
+      {/* PayPal Donation Button - Absolute Top Right Corner */}
+      <div className="absolute top-4 right-4 z-10 group">
+        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+          <input type="hidden" name="cmd" value="_s-xclick" />
+          <input type="hidden" name="hosted_button_id" value="2D5XX5HZM3E2L" />
+          <input type="hidden" name="currency_code" value="EUR" />
+          <button
+            type="submit"
+            className="inline-flex items-center gap-2 px-2 py-1 bg-gradient-to-r from-red-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-sm"
+            title="Podrži projekt putem Paypal"
+          >
+            <span>Podrži projekt, plati kavu ☕</span>
+          </button>
+        </form>
+        
+        {/* QR Code Tooltip */}
+        <div className="absolute top-full right-0 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-3 border border-gray-200 dark:border-gray-700">
+            <Image 
+              src="./paypal-link.png" 
+              alt="PayPal QR Code" 
+              width={288}
+              height={288}
+              className="object-contain"
+            />
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 text-center">Skeniraj za donaciju</p>
+          </div>
+        </div>
+      </div>
+
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
           <p className="text-lg text-gray-600 dark:text-gray-300">Generirajte barkodove za plaćanja i PDF račune</p>
