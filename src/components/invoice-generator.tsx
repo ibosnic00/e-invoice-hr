@@ -355,6 +355,13 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
     }
   }, [isDataLoadedFromHistory])
 
+  // Reset form when component is mounted (when tab is opened)
+  useEffect(() => {
+    handleResetForm()
+    console.log("Reset form")
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const handleInputChange = (field: keyof InvoiceData, value: string | number) => {
     setFormData((prev) => ({
       ...prev,

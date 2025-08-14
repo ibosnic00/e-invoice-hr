@@ -383,6 +383,13 @@ const BarcodeGenerator = forwardRef<any, {}>((props, ref) => {
     localStorage.removeItem("barcodeGeneratorData")
   } // ✅ Proper closing brace for handleResetForm
 
+  // Reset form when component is mounted (when tab is opened)
+  useEffect(() => {
+    handleResetForm()
+    console.log("Reset form")
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // ✅ Main component return statement
   return (
     <div className="space-y-6">
