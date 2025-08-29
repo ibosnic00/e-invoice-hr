@@ -237,6 +237,12 @@ const BarcodeGenerator = forwardRef<any, {}>((props, ref) => {
 
   const handleGenerateBarcode = () => {
     try {
+      // Validate opis plaćanja length
+      if (formData.OpisPlacanja.length > 35) {
+        setErrors(["Opis plaćanja ne smije biti duži od 35 znakova prema HUB3 standardu"])
+        return
+      }
+
       // Clear previous barcode
       if (barcodeRef.current) {
         const ctx = barcodeRef.current.getContext("2d")
@@ -477,7 +483,34 @@ const BarcodeGenerator = forwardRef<any, {}>((props, ref) => {
                 onChange={(e) => handleInputChange("OpisPlacanja", e.target.value)}
                 placeholder="Opis svrhe plaćanja"
                 rows={3}
+                maxLength={35}
+                className={formData.OpisPlacanja.length > 35 ? 'border-red-500 focus:border-red-500' : ''}
               />
+              <div className="flex justify-between items-center mt-1">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Maksimalna duljina je 35 znakova prema HUB3 standardu
+                </p>
+                <p className={`text-sm font-medium ${formData.OpisPlacanja.length > 35 ? 'text-red-500' : 'text-gray-500'}`}>
+                  {formData.OpisPlacanja.length}/35
+                </p>
+              </div>
+              {formData.OpisPlacanja.length > 35 && (
+                <div className="mt-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+                  <div className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <p className="text-sm font-medium text-red-800 dark:text-red-200">
+                        Opis plaćanja prekoračuje HUB3 standard
+                      </p>
+                      <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+                        Maksimalna duljina je 35 znakova. Skratite opis prije generiranja barkoda.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
