@@ -45,6 +45,7 @@ export interface InvoiceData {
   vrijemeIzdavanja: string;
   mjestoIDatumIsporuke: string;
   datumPlacanja: string;
+  opisPlacanja: string; // Add this line
   
   // Product/Service information - now supports multiple items
   items: InvoiceItem[];

@@ -47,7 +47,7 @@ interface InvoiceData {
   brojRacuna: string;
   pozivNaBroj: string;
   model: string;
-  opisPlacanja?: string;
+  opisPlacanja: string;
 }
 
 // Mock utility functions
@@ -443,6 +443,9 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
     if (cleaned) {
       const numericOnly = cleaned.replace(/[^0-9]/g, "");
       handleInputChange("pozivNaBroj", numericOnly);
+      
+      // Automatically populate opisPlacanja
+      handleInputChange("opisPlacanja", `Račun ${cleaned}`);
     }
   };
 
@@ -624,6 +627,14 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
         setFormData((prev) => ({
           ...prev,
           pozivNaBroj: formData.brojRacuna,
+        }));
+      }
+      
+      // Set opisPlacanja to "Račun" if not already set
+      if (!formData.opisPlacanja) {
+        setFormData((prev) => ({
+          ...prev,
+          opisPlacanja: `Račun ${formData.brojRacuna}`,
         }));
       }
 
