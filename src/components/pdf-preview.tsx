@@ -56,13 +56,9 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({ invoiceData }) => {
           .replace(/Đ/g, "D")
           .replace(/Ž/g, "Z");
       }
-      const opisPlacanjaNormalized = normalizeCroatianChars(
-        invoiceData.opisPlacanja
-      );
-
       const barcodeString = generateBarcodeString({
         IBAN: invoiceData.brojRacunaObrta,
-        Primatelj: invoiceData.imeFirme,
+        Primatelj: normalizeCroatianChars(invoiceData.imeFirme),
         Iznos: invoiceData.items
           ? invoiceData.items.reduce(
               (sum, item) => sum + item.cijenaPoJedinici * item.kolicina,
@@ -71,7 +67,12 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({ invoiceData }) => {
           : 0,
         ModelPlacanja: invoiceData.model || "00",
         PozivNaBroj: invoiceData.pozivNaBroj || invoiceData.brojRacuna,
-        OpisPlacanja: opisPlacanjaNormalized,
+        OpisPlacanja: normalizeCroatianChars(invoiceData.opisPlacanja),
+        ImePlatitelja: normalizeCroatianChars(invoiceData.imeKupca),
+        AdresaPlatitelja: normalizeCroatianChars(invoiceData.adresaKupca),
+        SjedistePlatitelja: normalizeCroatianChars(invoiceData.postanskiBrojIGradKupca),
+        AdresaPrimatelja: normalizeCroatianChars(invoiceData.adresaVlasnika),
+        SjedistePrimatelja: normalizeCroatianChars(invoiceData.postanskiBrojIGradVlasnika)
       });
 
       // Create a temporary canvas to generate barcode image
