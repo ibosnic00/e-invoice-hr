@@ -58,7 +58,7 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({ invoiceData }) => {
       }
       const barcodeString = generateBarcodeString({
         IBAN: invoiceData.brojRacunaObrta,
-        Primatelj: normalizeCroatianChars(invoiceData.imeFirme),
+        Primatelj: normalizeCroatianChars(companyFullName),
         Iznos: invoiceData.items
           ? invoiceData.items.reduce(
               (sum, item) => sum + item.cijenaPoJedinici * item.kolicina,
