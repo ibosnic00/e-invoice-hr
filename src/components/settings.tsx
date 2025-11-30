@@ -85,6 +85,9 @@ export default function SettingsComponent() {
       "PDV nije obračunat sukladno članku 90. stavku 1. i stavku 2. Zakona o PDV-u - mali porezni obveznik."
   );
   const [mbo, setMbo] = useState(localStorage.getItem("mbo") || "");
+  const [ownerName, setOwnerName] = useState(
+    localStorage.getItem("ownerName") || ""
+  );
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isInvoiceSettingsExpanded, setIsInvoiceSettingsExpanded] =
     useState(false);
@@ -142,6 +145,7 @@ export default function SettingsComponent() {
         companyPhone: localStorage.getItem("companyPhone"),
         vatNote: localStorage.getItem("vatNote"),
         mbo: localStorage.getItem("mbo"),
+        ownerName: localStorage.getItem("ownerName"),
         customers: localStorage.getItem("savedCustomers"),
         invoiceNumberSettings: localStorage.getItem("invoice-number-settings"),
         timestamp: new Date().toISOString(),
@@ -227,6 +231,8 @@ export default function SettingsComponent() {
         if (importedData.vatNote)
           localStorage.setItem("vatNote", importedData.vatNote);
         if (importedData.mbo) localStorage.setItem("mbo", importedData.mbo);
+        if (importedData.ownerName)
+          localStorage.setItem("ownerName", importedData.ownerName);
         if (importedData.customers)
           localStorage.setItem("savedCustomers", importedData.customers);
         if (importedData.invoiceNumberSettings)
@@ -282,6 +288,9 @@ export default function SettingsComponent() {
         }
         if (importedData.mbo) {
           setMbo(importedData.mbo);
+        }
+        if (importedData.ownerName) {
+          setOwnerName(importedData.ownerName);
         }
         if (importedData.customers) {
           setCustomers(getCustomers());
@@ -428,6 +437,12 @@ export default function SettingsComponent() {
     showToast("MBO je uspješno spremljen.", "success");
   };
 
+  const handleOwnerNameChange = (value: string) => {
+    setOwnerName(value);
+    localStorage.setItem("ownerName", value);
+    showToast("Ime vlasnika je uspješno spremljeno.", "success");
+  };
+
   // Invoice number settings handlers
   const handleAutomaticNumberingToggle = (enabled: boolean) => {
     const newSettings = {
@@ -533,6 +548,7 @@ export default function SettingsComponent() {
       "PDV nije obračunat sukladno članku 90. stavku 1. i stavku 2. Zakona o PDV-u - mali porezni obveznik."
     );
     setMbo("");
+    setOwnerName("");
     setCustomers([]);
     setInvoiceNumberSettings({
       useAutomaticNumbering: false,
@@ -555,6 +571,7 @@ export default function SettingsComponent() {
     localStorage.removeItem("companyPhone");
     localStorage.removeItem("vatNote");
     localStorage.removeItem("mbo");
+    localStorage.removeItem("ownerName");
     localStorage.removeItem("savedCustomers");
     localStorage.removeItem("invoice-number-settings");
 
@@ -651,6 +668,21 @@ export default function SettingsComponent() {
 
                 {isOtherSettingsExpanded && (
                   <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="owner-name">Polje Primatelj u barkodu</Label>
+                      <Input
+                        id="owner-name"
+                        value={ownerName}
+                        onChange={(e) =>
+                          handleOwnerNameChange(e.target.value)
+                        }
+                        placeholder="npr. Mate Matic, ili Ime Obrta, vl. Mate Matic"
+                      />
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Polje Primatelj u barkodu koje će se koristiti u barkodu generiranog PDF-a
+                      </p>
+                    </div>
+
                     <div className="space-y-2">
                       <Label htmlFor="company-full-name">
                         Dugi naziv obrta

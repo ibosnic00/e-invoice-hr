@@ -27,6 +27,9 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({ invoiceData }) => {
     localStorage.getItem("companyPhone") ||
     invoiceData.brojMobitelaVlasnika ||
     "";
+  const ownerName =
+    localStorage.getItem("ownerName") ||
+    companyFullName;
   const vatNote =
     localStorage.getItem("vatNote") ||
     "PDV nije obračunat sukladno članku 90. stavku 1. i stavku 2. Zakona o PDV-u - mali porezni obveznik.";
@@ -58,7 +61,7 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({ invoiceData }) => {
       }
       const barcodeString = generateBarcodeString({
         IBAN: invoiceData.brojRacunaObrta,
-        Primatelj: normalizeCroatianChars(companyFullName),
+        Primatelj: normalizeCroatianChars(ownerName),
         Iznos: invoiceData.items
           ? invoiceData.items.reduce(
               (sum, item) => sum + item.cijenaPoJedinici * item.kolicina,
