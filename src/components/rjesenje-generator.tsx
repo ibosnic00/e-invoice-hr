@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Upload, FileSearch, Download, AlertCircle, CheckCircle, Loader2 } from "lucide-react"
+import { Upload, FileSearch, Download, AlertCircle, CheckCircle, Loader2, X } from "lucide-react"
 import { generateBarcode } from "@/utils/generateBarcode"
 import type { PaymentParams } from "@/types/types"
 
@@ -146,6 +146,16 @@ export default function RjesenjeGenerator() {
     if (file) handleFileChange(file)
   }
 
+  const discardFile = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl)
+    setUploadedFile(null)
+    setPreviewUrl(null)
+    setPayments([])
+    setBarcodesGenerated(false)
+    setOcrError(null)
+    if (fileInputRef.current) fileInputRef.current.value = ""
+  }
+
   const runOCR = async () => {
     if (!uploadedFile) return
     setIsProcessing(true)
@@ -223,49 +233,67 @@ export default function RjesenjeGenerator() {
 
   return (
     <div className="space-y-6">
-      {/* Upload area */}
-      <div
-        className="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 transition-colors overflow-hidden"
-        style={{ minHeight: '25rem' }}
-        onClick={() => fileInputRef.current?.click()}
-        onDragOver={e => e.preventDefault()}
-        onDrop={handleDrop}
-      >
-        {/* Example document background */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/example-rjesenje.jpg"
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 w-full h-full object-cover opacity-10 pointer-events-none select-none"
-        />
-        <div className="relative z-10 flex flex-col items-center justify-center" style={{ minHeight: '25rem' }}>
-          <Upload className="h-10 w-10 mx-auto text-gray-400 mb-3" />
-          <p className="text-gray-600 dark:text-gray-400">
-            Povucite sliku ili PDF ovdje, ili{" "}
-            <span className="text-blue-500 underline">kliknite za odabir</span>
-          </p>
-          <p className="text-xs text-gray-400 mt-1">Podržano: JPG, PNG, PDF • ili zalijepite sliku (Ctrl+V)</p>
-        </div>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*,.pdf"
-          className="hidden"
-          onChange={e => e.target.files?.[0] && handleFileChange(e.target.files[0])}
-        />
-      </div>
-
-      {/* File preview */}
-      {previewUrl && !isPdf && (
-        <div className="border rounded-lg overflow-hidden max-h-72 flex justify-center bg-gray-50 dark:bg-gray-800">
+      {/* Upload area / file preview */}
+      {!uploadedFile ? (
+        <div
+          className="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 transition-colors overflow-hidden"
+          style={{ minHeight: '25rem' }}
+          onClick={() => fileInputRef.current?.click()}
+          onDragOver={e => e.preventDefault()}
+          onDrop={handleDrop}
+        >
+          {/* Example document background */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={previewUrl} alt="Pregled dokumenta" className="max-h-72 object-contain" />
+          <img
+            src="/example-rjesenje.jpg"
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-cover opacity-10 pointer-events-none select-none"
+          />
+          <div className="relative z-10 flex flex-col items-center justify-center" style={{ minHeight: '25rem' }}>
+            <Upload className="h-10 w-10 mx-auto text-gray-400 mb-3" />
+            <p className="text-gray-600 dark:text-gray-400">
+              Povucite sliku ili PDF ovdje, ili{" "}
+              <span className="text-blue-500 underline">kliknite za odabir</span>
+            </p>
+            <p className="text-xs text-gray-400 mt-1">Podržano: JPG, PNG, PDF • ili zalijepite sliku (Ctrl+V)</p>
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*,.pdf"
+            className="hidden"
+            onChange={e => e.target.files?.[0] && handleFileChange(e.target.files[0])}
+          />
         </div>
-      )}
-      {uploadedFile && isPdf && (
-        <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 text-center text-gray-600 dark:text-gray-300">
-          PDF datoteka odabrana: <strong>{uploadedFile.name}</strong>
+      ) : (
+        <div
+          className="relative border-2 border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden"
+          style={{ minHeight: '25rem' }}
+        >
+          <button
+            onClick={discardFile}
+            className="absolute top-2 right-2 z-20 bg-black/50 hover:bg-black/70 text-white rounded-full p-1"
+            title="Odbaci dokument"
+          >
+            <X className="h-4 w-4" />
+          </button>
+          {isPdf ? (
+            <embed
+              src={previewUrl!}
+              type="application/pdf"
+              className="w-full"
+              style={{ minHeight: '25rem' }}
+            />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={previewUrl!}
+              alt="Pregled dokumenta"
+              className="w-full h-full object-contain"
+              style={{ minHeight: '25rem' }}
+            />
+          )}
         </div>
       )}
 
@@ -302,7 +330,7 @@ export default function RjesenjeGenerator() {
           </p>
 
           {payments.map((payment, i) => (
-            <div key={i} className="border rounded-lg p-4 space-y-3 bg-white dark:bg-gray-800 shadow-sm">
+            <div key={i} className={`border rounded-lg p-4 space-y-3 shadow-sm ${i === 1 ? "bg-gray-50 dark:bg-gray-700" : "bg-white dark:bg-gray-800"}`}>
               <h4 className="font-semibold text-blue-700 dark:text-blue-400">{payment.label}</h4>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
