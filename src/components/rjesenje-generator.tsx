@@ -87,6 +87,7 @@ export default function RjesenjeGenerator() {
   // Incrementing this triggers the useEffect to draw barcodes after React renders the canvases
   const [generateTrigger, setGenerateTrigger] = useState(0)
 
+  const paymentsRef2 = useRef<HTMLDivElement>(null)
   const canvasRef0 = useRef<HTMLCanvasElement>(null)
   const canvasRef1 = useRef<HTMLCanvasElement>(null)
   const canvasRef2 = useRef<HTMLCanvasElement>(null)
@@ -201,6 +202,7 @@ export default function RjesenjeGenerator() {
       const parsed = parseRjesenjeText(text)
       setPayments(parsed)
       setBarcodesGenerated(false)
+      setTimeout(() => paymentsRef2.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100)
     } catch (err) {
       console.error(err)
       setOcrError("Greška pri analizi dokumenta. Provjerite datoteku i pokušajte ponovo.")
@@ -324,7 +326,7 @@ export default function RjesenjeGenerator() {
 
       {/* Payment cards */}
       {payments.length === 3 && (
-        <div className="space-y-4">
+        <div ref={paymentsRef2} className="space-y-4">
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Pronađene uplate — provjerite podatke i ispravite po potrebi:
           </p>
