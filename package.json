@@ -15,6 +15,7 @@
     "@radix-ui/react-switch": "^1.2.5",
     "@radix-ui/react-tabs": "^1.1.12",
     "@types/qrcode": "^1.5.5",
+    "canvg": "^4.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "fontkit": "^2.0.4",
@@ -23,14 +24,16 @@
     "jsbarcode": "^3.11.6",
     "jspdf": "^3.0.1",
     "lucide-react": "^0.536.0",
-    "next": "^14.0.0",
+    "next": "^15.5.14",
     "pdf-lib": "^1.17.1",
     "pdf417-generator": "^1.0.5",
+    "pdfjs-dist": "^3.11.174",
     "qrcode": "^1.5.4",
     "react": "^18",
     "react-dom": "^18",
     "tailwind-merge": "^3.3.1",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
     "@types/html2canvas": "^0.5.35",

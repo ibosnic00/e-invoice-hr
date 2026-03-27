@@ -3,12 +3,13 @@
 import { useState, useRef, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileText, History, QrCode, Settings } from "lucide-react"
+import { FileText, History, QrCode, Settings, Scroll } from "lucide-react"
 import Image from "next/image"
 import BarcodeGenerator from "@/components/barcode-generator"
 import InvoiceGenerator from "@/components/invoice-generator"
 import LastGeneratedItems from "@/components/last-generated-items"
 import SettingsComponent from "@/components/settings"
+import RjesenjeGenerator from "@/components/rjesenje-generator"
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState("barcode")
@@ -112,22 +113,30 @@ export default function HomePage() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8">
-            <TabsTrigger value="barcode" className="flex items-center gap-2">
-              <QrCode className="h-4 w-4" />
-              Generiranje barkoda
+          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 h-auto mb-8">
+            <TabsTrigger value="barcode" className="flex items-center gap-1 py-2 text-xs sm:text-sm">
+              <QrCode className="h-4 w-4 shrink-0" />
+              <span className="hidden sm:inline">Generiranje barkoda</span>
+              <span className="sm:hidden">Barkod</span>
             </TabsTrigger>
-            <TabsTrigger value="invoice" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Generiranje računa
+            <TabsTrigger value="invoice" className="flex items-center gap-1 py-2 text-xs sm:text-sm">
+              <FileText className="h-4 w-4 shrink-0" />
+              <span className="hidden sm:inline">Generiranje računa</span>
+              <span className="sm:hidden">Račun</span>
             </TabsTrigger>
-            <TabsTrigger value="history" className="flex items-center gap-2">
-              <History className="h-4 w-4" />
-              Zadnje generirano
+            <TabsTrigger value="history" className="flex items-center gap-1 py-2 text-xs sm:text-sm">
+              <History className="h-4 w-4 shrink-0" />
+              <span className="hidden sm:inline">Zadnje generirano</span>
+              <span className="sm:hidden">Povijest</span>
             </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              Postavke
+            <TabsTrigger value="settings" className="flex items-center gap-1 py-2 text-xs sm:text-sm">
+              <Settings className="h-4 w-4 shrink-0" />
+              <span>Postavke</span>
+            </TabsTrigger>
+            <TabsTrigger value="rjesenje" className="flex items-center gap-1 py-2 text-xs sm:text-sm">
+              <Scroll className="h-4 w-4 shrink-0" />
+              <span className="hidden sm:inline">Rješenje PU</span>
+              <span className="sm:hidden">Rješenje</span>
             </TabsTrigger>
           </TabsList>
 
@@ -189,6 +198,21 @@ export default function HomePage() {
               </CardHeader>
               <CardContent>
                 <SettingsComponent />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="rjesenje">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Scroll className="h-5 w-5" />
+                  Rješenje porezne uprave
+                </CardTitle>
+                <CardDescription>Učitajte skeniranu sliku ili PDF rješenja i generirajte 3 barkoda za doprinose</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <RjesenjeGenerator />
               </CardContent>
             </Card>
           </TabsContent>
