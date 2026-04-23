@@ -83,7 +83,8 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({ invoiceData }) => {
       canvas.width = 400;
       canvas.height = 200;
 
-      PDF417.draw(barcodeString, canvas, 3);
+      // Explicitly pass devicePixelRatio to fix blurry rendering after system/browser updates
+      PDF417.draw(barcodeString, canvas, 3, -1, 3);
 
       return canvas.toDataURL("image/png");
     } catch (error) {

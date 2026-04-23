@@ -33,7 +33,9 @@ export const generateBarcode = (paymentParams: PaymentParams, barcodeRef: React.
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
             }
 
-            PDF417.draw(normalizedString, canvas, 5);
+            // Explicitly pass devicePixelRatio to fix blurry rendering after system/browser updates
+            // Use higher value (2-3) for crisp barcodes regardless of system settings
+            PDF417.draw(normalizedString, canvas, 5, -1, 3);
         } else {
             console.error("Failed to get canvas reference.");
         }
