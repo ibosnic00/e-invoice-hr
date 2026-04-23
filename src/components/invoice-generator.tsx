@@ -989,7 +989,7 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
                     />
                   </svg>
                 </button>
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none w-72 z-10">
                   <div className="text-xs">
                     <p className="font-semibold mb-1">Format broja računa:</p>
                     <p>
@@ -1008,7 +1008,7 @@ const InvoiceGenerator = forwardRef<InvoiceGeneratorRef, {}>((props, ref) => {
                       kako ćeš numerirati brojeve prema internom aktu.
                     </p>
                   </div>
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                  <div className="absolute top-full right-3 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
                 </div>
               </div>
             </div>

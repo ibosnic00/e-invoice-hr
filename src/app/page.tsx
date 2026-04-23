@@ -76,7 +76,7 @@ export default function HomePage() {
   }
 
   return (
-  <div className="min-h-screen bg-blue-50 dark:bg-gray-900 p-4 relative">      
+  <div className="min-h-screen bg-blue-50 dark:bg-gray-900 p-4 relative overflow-x-hidden">      
       {/* PayPal Donation Button - Absolute Top Right Corner */}
       <div className="absolute top-4 right-4 z-10 group">
         <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
