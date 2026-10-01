@@ -3,13 +3,14 @@
 import { useState, useRef, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileText, History, QrCode, Settings, Scroll } from "lucide-react"
+import { FileText, History, PieChart, QrCode, Settings, Scroll } from "lucide-react"
 import Image from "next/image"
 import BarcodeGenerator from "@/components/barcode-generator"
 import InvoiceGenerator from "@/components/invoice-generator"
 import LastGeneratedItems from "@/components/last-generated-items"
 import SettingsComponent from "@/components/settings"
 import RjesenjeGenerator from "@/components/rjesenje-generator"
+import Reports from "@/components/reports"
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState("barcode")
@@ -113,7 +114,7 @@ export default function HomePage() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 h-auto mb-8">
+          <TabsList className="grid w-full grid-cols-3 xl:grid-cols-6 h-auto mb-8">
             <TabsTrigger value="barcode" className="flex items-center gap-1 py-2 text-xs sm:text-sm">
               <QrCode className="h-4 w-4 shrink-0" />
               <span className="hidden sm:inline">Generiranje barkoda</span>
@@ -137,6 +138,11 @@ export default function HomePage() {
               <Scroll className="h-4 w-4 shrink-0" />
               <span className="hidden sm:inline">Rješenje PU</span>
               <span className="sm:hidden">Rješenje</span>
+            </TabsTrigger>
+            <TabsTrigger value="reports" className="flex items-center gap-1 py-2 text-xs sm:text-sm">
+              <PieChart className="h-4 w-4 shrink-0" />
+              <span className="hidden sm:inline">Izvještaji</span>
+              <span className="sm:hidden">Izvještaj</span>
             </TabsTrigger>
           </TabsList>
 
@@ -213,6 +219,21 @@ export default function HomePage() {
               </CardHeader>
               <CardContent>
                 <RjesenjeGenerator />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="reports">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <PieChart className="h-5 w-5" />
+                  Izvještaji
+                </CardTitle>
+                <CardDescription>Pregled prihoda i raspodjele po klijentima</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Reports />
               </CardContent>
             </Card>
           </TabsContent>
