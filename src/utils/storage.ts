@@ -62,6 +62,20 @@ export function removeFromHistory(id: string): void {
   }
 }
 
+export function updateHistoryItem(id: string, data: HistoryItem["data"]): void {
+  if (typeof window === "undefined") return
+
+  try {
+    const existing = getHistory()
+    const updated = existing.map((item) =>
+      item.id === id ? { ...item, data } : item
+    )
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+  } catch (error) {
+    console.error("Error updating history item:", error)
+  }
+}
+
 export function getInvoiceNumberSettings(): InvoiceNumberSettings {
   if (typeof window === "undefined") {
     return {
