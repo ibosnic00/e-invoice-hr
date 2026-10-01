@@ -78,7 +78,6 @@ export default function Reports() {
   )
 
   const periodTotal = sumCents(periodInvoices)
-  const allTimeTotal = sumCents(invoices)
   const average = periodInvoices.length > 0 ? periodTotal / periodInvoices.length : 0
   const topClient = shares[0]
 
@@ -182,7 +181,7 @@ export default function Reports() {
             <Stat label="Broj računa" value={String(periodInvoices.length)} />
             <Stat label="Prosječni račun" value={formatEur(average)} />
             <Stat label="Najveći klijent" value={topClient ? topClient.name : "—"} />
-            <Stat label="Sveukupni prihod" value={formatEur(allTimeTotal)} />
+            <Stat label="Prihod" value={formatEur(periodTotal)} />
           </div>
           {series.length > 1 ? (
             <GrowthChart points={series} dark={theme === "dark"} />
